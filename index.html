@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>SubTopo-Autocad</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+<div id="app">
+
+<!-- MODAL DIALOG -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-titlebar">
+      <span id="modalTitle">Titre</span>
+      <button class="modal-close" id="modalClose" title="Fermer">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TITLE BAR -->
+<div id="titlebar">
+  <h1 id="titlebar-h1">SubTopo-Autocad <span class="tb-file"></span> [Édition]</h1>
+  <button class="tb-wbtn">&#8212;</button>
+  <button class="tb-wbtn">&#9633;</button>
+  <button class="tb-wbtn x">&#x2715;</button>
+</div>
+
+<!-- MENU BAR -->
+<div id="menubar">
+  <div class="menu-item">Fichier<div class="menu-drop">
+    <div class="md-item" onclick="newFile()">Nouveau<span class="md-shortcut">Ctrl+N</span></div>
+    <div class="md-item" onclick="openFile()">Ouvrir...<span class="md-shortcut">Ctrl+O</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="saveFile()">Enregistrer<span class="md-shortcut">Ctrl+S</span></div>
+    <div class="md-item" onclick="saveAsFile()">Enregistrer sous…<span class="md-shortcut">Ctrl+Shift+S</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="exportDXF()">Exporter DXF</div>
+    <div class="md-item" onclick="exportSVG()">Exporter SVG</div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="window.print()">Imprimer<span class="md-shortcut">Ctrl+P</span></div>
+  </div></div>
+  <div class="menu-item">Édition<div class="menu-drop">
+    <div class="md-item" onclick="undo()">Annuler<span class="md-shortcut">Ctrl+Z</span></div>
+    <div class="md-item" onclick="redo()">Rétablir<span class="md-shortcut">Ctrl+Y</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="selectAll()">Tout sélectionner<span class="md-shortcut">Ctrl+A</span></div>
+    <div class="md-item" onclick="deleteSelected()">Effacer sélection<span class="md-shortcut">Del</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="copySelected()">Copier<span class="md-shortcut">Ctrl+C</span></div>
+  </div></div>
+  <div class="menu-item">Affichage<div class="menu-drop">
+    <div class="md-item" onclick="fitView()">Zoom étendu<span class="md-shortcut">Z E</span></div>
+    <div class="md-item" onclick="zoom(2)">Zoom +<span class="md-shortcut">+</span></div>
+    <div class="md-item" onclick="zoom(0.5)">Zoom -<span class="md-shortcut">-</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="toggleGrid()">Grille<span class="md-shortcut">F7</span></div>
+    <div class="md-item" onclick="toggleOrtho()">Ortho<span class="md-shortcut">F8</span></div>
+    <div class="md-item" onclick="toggleSnap()">Accrochage<span class="md-shortcut">F3</span></div>
+  </div></div>
+  <div class="menu-item">Insérer<div class="menu-drop">
+    <div class="md-item" onclick="setTool('line')">Ligne</div>
+    <div class="md-item" onclick="setTool('pline')">Polyligne</div>
+    <div class="md-item" onclick="setTool('circle')">Cercle</div>
+    <div class="md-item" onclick="setTool('arc')">Arc</div>
+    <div class="md-item" onclick="setTool('rect')">Rectangle</div>
+    <div class="md-item" onclick="setTool('text')">Texte</div>
+  </div></div>
+  <div class="menu-item">Outils<div class="menu-drop">
+    <div class="md-item" onclick="setTool('measure')">Mesure distance<span class="md-shortcut">MES</span></div>
+    <div class="md-item" onclick="setTool('measureLen')">Mesure longueur</div>
+    <div class="md-item" onclick="setTool('measureAngle')">Mesure angle</div>
+    <div class="md-item" onclick="setTool('measureArea')">Mesure surface<span class="md-shortcut">AIRE</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="clearMeasurements()">Effacer mesures</div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="showLayerManager()">Gestionnaire de calques…<span class="md-shortcut">LA</span></div>
+    <div class="md-sep"></div>
+    <div class="md-item" onclick="purge()">Purger</div>
+  </div></div>
+  <div class="menu-item">Aide<div class="menu-drop">
+    <div class="md-item" onclick="showHelp()">Raccourcis clavier</div>
+    <div class="md-item">À propos</div>
+  </div></div>
+</div>
+
+<!-- RIBBON -->
+<div id="ribbon">
+  <div id="ribbon-tabs">
+    <div class="rtab active" data-tab="home">Accueil</div>
+    <div class="rtab" data-tab="insert">Insérer</div>
+    <div class="rtab" data-tab="modify">Modifier</div>
+    <div class="rtab" data-tab="annot">Annoter</div>
+    <div class="rtab" data-tab="view">Vue</div>
+    <div class="rtab" data-tab="layers">Calques</div>
+  </div>
+  <div id="ribbon-body"></div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LEFT TOOLBAR -->
+  <div id="toolbar">
+    <button class="tbtn active" id="tsel" onclick="setTool('select')" title="Sélectionner (Esc / S)">&#x2B9D;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" id="tline" onclick="setTool('line')" title="Ligne (L)">&#x2F;</button>
+    <button class="tbtn" id="tpline" onclick="setTool('pline')" title="Polyligne (PL)">&#x2310;</button>
+    <button class="tbtn" id="tcircle" onclick="setTool('circle')" title="Cercle (C)">&#x25EF;</button>
+    <button class="tbtn" id="tarc" onclick="setTool('arc')" title="Arc (A)">&#x2312;</button>
+    <button class="tbtn" id="trect" onclick="setTool('rect')" title="Rectangle (REC)">&#x25A1;</button>
+    <button class="tbtn" id="tspline" onclick="setTool('spline')" title="Spline (SP)">&#x223F;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" id="tmove" onclick="setTool('move')" title="Déplacer (M)">&#x2725;</button>
+    <button class="tbtn" id="tcopy" onclick="setTool('copy')" title="Copier (CO)">&#x2398;</button>
+    <button class="tbtn" id="trotate" onclick="setTool('rotate')" title="Rotation (RO)">&#x21BA;</button>
+    <button class="tbtn" id="tscale" onclick="setTool('scale')" title="Échelle (SC)">&#x2922;</button>
+    <button class="tbtn" id="tmirror" onclick="setTool('mirror')" title="Symétrie (MI)">&#x21C6;</button>
+    <button class="tbtn" id="toffset" onclick="setTool('offset')" title="Décaler (O)">&#x22CF;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" id="terase" onclick="deleteSelected()" title="Effacer sél. (Del)">&#x232B;</button>
+    <button class="tbtn" id="ttrim" onclick="setTool('trim')" title="Ajuster (TR)">&#x2702;</button>
+    <button class="tbtn" id="textend" onclick="setTool('extend')" title="Allonger (EX)">&#x21A6;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" id="ttext" onclick="setTool('text')" title="Texte (T)">T</button>
+    <button class="tbtn" id="tdim" onclick="setTool('dim')" title="Cote (DIM)">&#x2194;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" id="tmeasure" onclick="measureDist()" title="Mesure distance (MES)">&#x21AF;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" id="tzoom" onclick="setTool('zoom')" title="Zoom (Z)">&#x1F50D;</button>
+    <button class="tbtn" id="tpan" onclick="setTool('pan')" title="Pan (P)">&#x270B;</button>
+    <button class="tbtn" onclick="fitView()" title="Zoom étendu (ZE)">&#x26F6;</button>
+    <div class="tbtn-sep"></div>
+    <button class="tbtn" onclick="undo()" title="Annuler (Ctrl+Z)">&#x21A9;</button>
+    <button class="tbtn" onclick="redo()" title="Rétablir (Ctrl+Y)">&#x21AA;</button>
+  </div>
+
+  <!-- VIEWPORT -->
+  <div id="vp-wrap">
+    <div id="vp-tabs">
+      <div class="vptab active">Model</div>
+      <div class="vptab">Layout1</div>
+      <div class="vptab">Layout2</div>
+      <button class="vptab-add" onclick="addLayout()">+</button>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="grid"></canvas>
+      <canvas id="cad"></canvas>
+      <svg id="ucs" viewBox="0 0 56 56">
+        <defs>
+          <marker id="aX" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5z" fill="#ef4444"/></marker>
+          <marker id="aY" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5z" fill="#22c55e"/></marker>
+        </defs>
+        <line x1="6" y1="46" x2="36" y2="46" stroke="#ef4444" stroke-width="2" marker-end="url(#aX)"/>
+        <line x1="6" y1="46" x2="6" y2="16" stroke="#22c55e" stroke-width="2" marker-end="url(#aY)"/>
+        <text x="38" y="50" fill="#ef4444" font-size="9" font-family="monospace">E</text>
+        <text x="8" y="14" fill="#22c55e" font-size="9" font-family="monospace">N</text>
+        <circle cx="6" cy="46" r="3" fill="#4b5563"/>
+      </svg>
+      <div id="navcube" onclick="cycleView()">
+        <span style="color:#60a5fa;font-size:10px;font-weight:600" id="nav-face">PLAN</span>
+        <span style="font-size:8px">Vue</span>
+      </div>
+      <div id="vp-info">[ UTM 33N ] [ 2D Filaire ] [ mm ]</div>
+    </div>
+    <div id="coords">
+      <span class="cl">E:</span><span class="cv" id="cE">0.000</span>
+      <span class="cl">N:</span><span class="cv" id="cN">0.000</span>
+      <span class="cl">ΔX:</span><span class="cv" id="cDX">0.000</span>
+      <span class="cl">ΔY:</span><span class="cv" id="cDY">0.000</span>
+      <span class="cl">Dist:</span><span class="cv" id="cD">0.000</span>
+      <span class="cl">Angle:</span><span class="cv" id="cAng">0.0°</span>
+      <span class="cl" style="margin-left:auto">Calque:</span>
+      <span style="color:#60a5fa;font-family:monospace" id="cLayer">0</span>
+    </div>
+    <div id="cmdarea">
+      <div id="cmdhist">
+        <span style="color:#4b5563">678 entités · 11 calques chargés</span><br>
+        <span style="color:#4b5563">Commandes: LIGNE(L) CERCLE(C) RECT(REC) ARC(A) TEXTE(T) PAN(P) ZOOM(Z) ANNULER(Ctrl+Z)</span>
+      </div>
+      <div id="cmdrow">
+        <span id="cmdprompt">Commande:</span>
+        <input id="cmdinput" autocomplete="off" spellcheck="false" placeholder="Entrez une commande..."/>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="rpanel">
+    <div id="rp-tabs">
+      <div class="rptab active" onclick="showPanel('props',this)">Props</div>
+      <div class="rptab" onclick="showPanel('layers',this)">Calques</div>
+      <div class="rptab" onclick="showPanel('measures',this)">Mesures</div>
+      <div class="rptab" onclick="showPanel('tools',this)">Outils</div>
+    </div>
+    <div id="rp-body"></div>
+  </div>
+
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <div class="si on" id="si-accrobj" onclick="toggleSnap()">ACCROBJ</div>
+  <div class="ssep"></div>
+  <div class="si on" id="si-ortho" onclick="toggleOrtho()">ORTHO</div>
+  <div class="ssep"></div>
+  <div class="si on" id="si-grille" onclick="toggleGrid()">GRILLE</div>
+  <div class="ssep"></div>
+  <div class="si on" id="si-polaire" onclick="togglePolaire()">POLAIRE</div>
+  <div class="ssep"></div>
+  <div class="si on" id="si-dyna" onclick="toggleDyna()">DYNA</div>
+  <div class="ssep"></div>
+  <div class="si" id="si-llig" onclick="toggleLLig()">L-LIG</div>
+  <div class="sr">
+    <span style="color:#374151;font-size:9px">Sél: <span id="s-sel" style="color:#60a5fa">0</span></span>
+    <span style="color:#374151;font-size:9px">Total: <span style="color:#60a5fa">678</span></span>
+    <button class="smini" onclick="fitView()">&#x26F6; Étendu</button>
+    <button class="smini" onclick="saveFile()" title="Enregistrer (Ctrl+S)">&#x1F4BE; Enreg.</button>
+    <button class="smini" onclick="showHelp()">?</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+<script src="assets/cad.js"></script>
+</body>
+</html>
