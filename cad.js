@@ -1,0 +1,2644 @@
+/* Brega Airport CAD — JavaScript extracted from cad.html */
+
+// ═══════════════════════════════════════════
+//  BREGA AIRPORT CAD EDITOR — ENGINE
+// ═══════════════════════════════════════════
+
+const XMIN = 362559.977;
+const YMIN = 3360679.916;
+const DX = 1275.988;
+const DY = 1868.018;
+
+// ── LAYER DEFINITIONS ──
+const LAYER_DEF = {"0": {"color": "#c8c8c8", "lw": 0.5}, "BUILDING": {"color": "#00bfff", "lw": 1.2}, "Edging": {"color": "#00e676", "lw": 0.8}, "Hangar": {"color": "#ffa726", "lw": 1.4}, "Height": {"color": "#9e9e9e", "lw": 0.4}, "Main Road": {"color": "#ff7043", "lw": 2.0}, "Point_Code": {"color": "#ce93d8", "lw": 0.4}, "Point_ID": {"color": "#80deea", "lw": 0.4}, "SAAD": {"color": "#f48fb1", "lw": 0.7}, "hatch": {"color": "#66bb6a", "lw": 0.4}, "manhole": {"color": "#ef5350", "lw": 0.8}};
+
+// ── ENTITIES (loaded from DXF) ──
+let ENTITIES = [{"id": 1, "type": "LWPOLYLINE", "layer": "0", "pts": [[917.059, 1132.37], [910.989, 1139.054], [943.691, 1175.196], [986.883, 1147.134], [991.771, 1146.084]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 2, "type": "LWPOLYLINE", "layer": "0", "pts": [[997.542, 1142.154], [998.234, 1138.044], [1017.759, 1125.079], [1022.345, 1132.001], [1045.242, 1116.876], [1022.41, 1081.422], [1011.199, 1088.15], [1005.681, 1079.987], [962.781, 1103.783], [923.046, 1126.356]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 3, "type": "LWPOLYLINE", "layer": "0", "pts": [[1205.265, 1347.804], [1173.143, 1368.854], [1172.738, 1372.658], [1183.362, 1382.809], [1193.206, 1392.357], [1257.84, 1453.344]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 4, "type": "LWPOLYLINE", "layer": "0", "pts": [[1250.867, 1455.595], [1187.908, 1395.211], [1165.636, 1373.894], [1106.706, 1412.647], [1047.222, 1322.129], [1036.452, 1313.891], [1017.676, 1315.238]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 5, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1104.543, 1317.774], [1105.43, 1317.208], [1104.795, 1316.213], [1103.908, 1316.779], [1104.543, 1317.774]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 6, "type": "LWPOLYLINE", "layer": "0", "pts": [[1060.374, 1135.15], [1056.515, 1129.235], [1057.313, 1128.723], [1055.172, 1125.386], [1057.789, 1123.693], [1063.715, 1132.926], [1060.374, 1135.15]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 7, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1069.934, 1137.606], [1063.15, 1142.047], [1066.121, 1146.844], [1073.023, 1142.325], [1069.934, 1137.606]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 8, "type": "LWPOLYLINE", "layer": "0", "pts": [[1069.934, 1137.606], [1069.461, 1136.883], [1061.374, 1142.177]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 9, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1182.154, 1252.413], [1181.97, 1252.48], [1181.856, 1252.166], [1182.04, 1252.099], [1182.154, 1252.413]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 10, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1152.554, 1237.107], [1151.664, 1237.722], [1151.137, 1236.965], [1152.027, 1236.35], [1152.554, 1237.107]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 11, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1146.806, 1240.032], [1145.936, 1240.617], [1146.525, 1241.493], [1147.395, 1240.908], [1146.806, 1240.032]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 12, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1136.507, 1213.558], [1136.014, 1212.796], [1135.131, 1213.367], [1135.624, 1214.129]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 13, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1124.157, 1196.619], [1123.7, 1195.917], [1124.493, 1195.401], [1124.95, 1196.102], [1124.157, 1196.619]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 14, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1094.073, 1182.343], [1090.472, 1176.81], [1087.667, 1178.52], [1091.321, 1184.134], [1094.073, 1182.343]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 15, "type": "LWPOLYLINE", "layer": "0", "pts": [[1085.919, 1171.906], [1089.532, 1177.333]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 16, "type": "LWPOLYLINE", "layer": "0", "pts": [[1094.073, 1182.343], [1095.824, 1181.17]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 17, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1102.046, 1200.395], [1103.577, 1202.726], [1105.701, 1201.331], [1104.17, 1199.0], [1102.046, 1200.395]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 18, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1116.699, 1219.714], [1118.82, 1222.777], [1117.4, 1223.76], [1115.279, 1220.697]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 19, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1202.79, 1333.688], [1198.742, 1326.643], [1211.513, 1318.178], [1213.855, 1321.894], [1220.473, 1317.723], [1222.756, 1321.105], [1202.79, 1333.688]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 20, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1211.513, 1318.178], [1217.915, 1313.934], [1220.473, 1317.723]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 21, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1217.915, 1313.934], [1213.855, 1321.894]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 22, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1211.513, 1318.178], [1220.473, 1317.723]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 23, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1188.542, 1295.202], [1197.325, 1289.888], [1191.027, 1279.478], [1182.244, 1284.792], [1188.542, 1295.202]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 24, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1191.837, 1256.348], [1183.244, 1261.965], [1194.961, 1280.613], [1196.961, 1283.795], [1205.653, 1278.271], [1191.837, 1256.348]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 25, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1202.634, 1273.481], [1193.92, 1278.956]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 26, "type": "LWPOLYLINE", "layer": "0", "pts": [[1185.372, 1308.655], [1186.858, 1310.863], [1230.101, 1283.095], [1203.883, 1242.58], [1189.19, 1251.005]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 27, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1195.084, 1248.417], [1195.594, 1248.987], [1194.779, 1249.716], [1194.269, 1249.147], [1195.084, 1248.417]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 28, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1197.012, 1251.272], [1195.878, 1251.897], [1195.424, 1251.074], [1196.558, 1250.449], [1197.012, 1251.272]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 29, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1192.233, 1253.293], [1191.703, 1253.625], [1192.084, 1254.201], [1192.614, 1253.869], [1192.233, 1253.293]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 30, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1195.082, 1258.956], [1195.56, 1258.692], [1195.296, 1258.215], [1194.818, 1258.478], [1195.082, 1258.956]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 31, "type": "LWPOLYLINE", "layer": "0", "pts": [[1210.115, 1256.184], [1211.252, 1257.923], [1209.255, 1259.228], [1208.119, 1257.489]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 32, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1177.123, 1255.499], [1177.367, 1255.752], [1177.542, 1255.583], [1177.298, 1255.33], [1177.123, 1255.499]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 33, "type": "LWPOLYLINE", "layer": "0", "pts": [[1166.141, 1277.847], [1184.579, 1266.285], [1185.936, 1266.249]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 34, "type": "LWPOLYLINE", "layer": "0", "pts": [[1135.842, 1230.363], [1128.577, 1218.916]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 35, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1146.28, 1249.505], [1137.81, 1254.908], [1133.028, 1247.413], [1141.455, 1242.059]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 36, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1146.963, 1250.558], [1138.481, 1255.969], [1143.265, 1263.527], [1151.828, 1258.065]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 37, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1141.455, 1242.059], [1151.828, 1258.065]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 38, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1152.512, 1259.12], [1161.42, 1272.867], [1159.074, 1274.436], [1152.641, 1264.82], [1146.6, 1268.795], [1143.938, 1264.59]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 39, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1158.745, 1274.959], [1159.724, 1274.316], [1160.471, 1275.267], [1159.492, 1275.91], [1158.745, 1274.959]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 40, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1170.17, 1255.583], [1169.996, 1255.721], [1169.848, 1255.535], [1170.022, 1255.397], [1170.17, 1255.583]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 41, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1175.215, 1252.663], [1174.945, 1252.404], [1175.204, 1252.134], [1175.474, 1252.393]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 42, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1186.654, 1259.736], [1185.532, 1258.02], [1187.465, 1256.751], [1188.589, 1258.471]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 43, "type": "LWPOLYLINE", "layer": "Hangar", "pts": [[1218.952, 1267.192], [1205.226, 1275.861], [1215.827, 1291.542], [1228.81, 1282.614], [1218.952, 1267.192]], "color": "#ffa726", "lw": 1.4, "selected": false}, {"id": 44, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1202.713, 1252.662], [1203.769, 1254.23], [1205.163, 1253.291], [1204.107, 1251.723], [1202.713, 1252.662]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 45, "type": "LWPOLYLINE", "layer": "manhole", "pts": [[1202.116, 1253.685], [1202.855, 1252.991], [1202.175, 1252.267], [1201.436, 1252.961], [1202.116, 1253.685]], "color": "#ef5350", "lw": 0.8, "selected": false}, {"id": 46, "type": "LWPOLYLINE", "layer": "0", "pts": [[1210.115, 1256.184], [1209.255, 1259.228]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 47, "type": "LWPOLYLINE", "layer": "0", "pts": [[1208.119, 1257.489], [1211.252, 1257.923]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 48, "type": "LWPOLYLINE", "layer": "0", "pts": [[1226.355, 1291.823], [1224.345, 1288.433], [1205.399, 1299.665], [1207.409, 1303.055], [1226.355, 1291.823]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 49, "type": "LWPOLYLINE", "layer": "0", "pts": [[1202.557, 1303.654], [1195.049, 1308.621], [1196.71, 1311.335], [1204.218, 1306.368], [1202.557, 1303.654]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 50, "type": "LWPOLYLINE", "layer": "0", "pts": [[1182.138, 1303.55], [1166.141, 1277.847], [1139.136, 1235.515]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 51, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[48.268, 30.304], [31.973, 5.256]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 52, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[45.521, 32.191], [29.199, 7.035]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 53, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[42.817, 33.955], [26.37, 8.834]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 54, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[39.961, 35.747], [23.65, 10.594]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 55, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[35.798, 38.454], [19.479, 13.269]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 56, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[32.962, 40.212], [16.719, 15.039]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 57, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[30.254, 41.96], [13.903, 16.844]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 58, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[27.505, 43.788], [11.173, 18.595]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 59, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[783.326, 1165.389], [767.175, 1140.294]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 60, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[780.629, 1167.135], [764.35, 1142.022]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 61, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[777.757, 1168.86], [761.544, 1143.75]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 62, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[774.954, 1170.625], [758.751, 1145.454]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 63, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[771.244, 1172.924], [755.004, 1147.765]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 64, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[768.39, 1174.623], [752.16, 1149.445]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 65, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[765.58, 1176.342], [749.383, 1151.192]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 66, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[762.87, 1178.104], [746.56, 1152.888]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 67, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1121.082, 1686.046], [1088.471, 1635.637]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 68, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1118.252, 1687.8], [1085.678, 1637.335]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 69, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1115.454, 1689.533], [1082.873, 1639.065]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 70, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1112.659, 1691.259], [1080.062, 1640.785]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 71, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1108.561, 1693.789], [1075.941, 1643.315]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 72, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1105.651, 1695.531], [1073.13, 1645.025]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 73, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1102.846, 1697.261], [1070.324, 1646.771]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 74, "type": "LWPOLYLINE", "layer": "SAAD", "pts": [[1100.023, 1698.976], [1067.439, 1648.503]], "color": "#f48fb1", "lw": 0.7, "selected": false}, {"id": 75, "type": "LWPOLYLINE", "layer": "0", "pts": [[1004.821, 1295.728], [924.252, 1349.652], [902.13, 1345.232], [33.482, 4.289], [9.732, 19.519], [1207.404, 1868.018], [1232.755, 1852.377], [1220.28, 1798.838], [1189.155, 1787.985], [932.364, 1391.56], [936.956, 1369.263], [1017.676, 1315.238]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 76, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1203.745, 1241.59], [1199.589, 1234.754], [1194.462, 1237.871], [1198.618, 1244.707], [1203.745, 1241.59]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 77, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1192.202, 1245.052], [1193.902, 1247.848], [1197.039, 1246.049], [1195.365, 1243.13], [1192.202, 1245.052]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 78, "type": "LWPOLYLINE", "layer": "Main Road", "pts": [[835.656, 1054.572], [917.121, 1132.247]], "color": "#ff7043", "lw": 2.0, "selected": false}, {"id": 79, "type": "LWPOLYLINE", "layer": "Main Road", "pts": [[900.866, 1116.748], [932.01, 1119.822], [932.01, 1119.822], [1011.63, 1071.951], [1021.946, 1067.782], [1029.608, 1067.102], [1037.002, 1068.218], [1042.835, 1071.618], [1049.903, 1079.079], [1056.03, 1089.115], [1083.859, 1129.948], [1127.812, 1193.801], [1126.704, 1199.242], [1115.141, 1206.591], [1124.659, 1221.148]], "color": "#ff7043", "lw": 2.0, "selected": false}, {"id": 80, "type": "LWPOLYLINE", "layer": "Main Road", "pts": [[839.872, 1050.149], [904.517, 1111.786], [929.012, 1114.494], [1008.894, 1066.465], [1020.5, 1061.776], [1029.796, 1060.951], [1039.07, 1062.35], [1046.669, 1066.78], [1054.783, 1075.344], [1061.166, 1085.8], [1088.9, 1126.495], [1132.973, 1190.521], [1138.617, 1191.671], [1148.643, 1185.299], [1157.741, 1200.264]], "color": "#ff7043", "lw": 2.0, "selected": false}, {"id": 81, "type": "LWPOLYLINE", "layer": "0", "pts": [[997.542, 1142.154], [1022.006, 1179.849]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 82, "type": "LWPOLYLINE", "layer": "0", "pts": [[991.771, 1146.084], [995.728, 1152.182]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 83, "type": "LWPOLYLINE", "layer": "0", "pts": [[923.046, 1126.356], [921.356, 1129.829]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 84, "type": "LWPOLYLINE", "layer": "0", "pts": [[917.059, 1132.37], [921.668, 1130.494]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 85, "type": "LWPOLYLINE", "layer": "0", "pts": [[1191.837, 1256.348], [1192.31, 1256.039], [1157.741, 1200.264], [1140.698, 1211.079]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 86, "type": "LWPOLYLINE", "layer": "0", "pts": [[1049.906, 1144.126], [1049.548, 1144.357], [1049.973, 1145.017], [1050.331, 1144.786], [1049.906, 1144.126]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 87, "type": "LWPOLYLINE", "layer": "0", "pts": [[1048.539, 1142.109], [1048.181, 1142.34], [1048.606, 1143.0], [1048.964, 1142.769], [1048.539, 1142.109]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 88, "type": "LWPOLYLINE", "layer": "0", "pts": [[1139.136, 1235.515], [1139.212, 1231.868]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 89, "type": "LWPOLYLINE", "layer": "0", "pts": [[1135.842, 1230.363], [1138.31, 1232.011]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 90, "type": "LWPOLYLINE", "layer": "0", "pts": [[1136.869, 1213.554], [1128.477, 1218.978], [1124.083, 1221.686], [1122.123, 1221.221], [1095.824, 1181.17], [1106.948, 1173.718], [1100.013, 1162.522], [1085.919, 1171.906], [1069.326, 1146.986], [1065.923, 1148.732], [1061.374, 1142.177], [1050.563, 1148.856], [1034.526, 1123.954]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 91, "type": "LWPOLYLINE", "layer": "0", "pts": [[1136.869, 1213.554], [1139.285, 1213.275]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 92, "type": "LWPOLYLINE", "layer": "0", "pts": [[1140.698, 1211.079], [1139.565, 1212.676]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 93, "type": "LWPOLYLINE", "layer": "0", "pts": [[991.771, 1146.084], [993.769, 1142.553]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 94, "type": "LWPOLYLINE", "layer": "0", "pts": [[997.542, 1142.154], [994.615, 1143.082]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 95, "type": "LWPOLYLINE", "layer": "Hangar", "pts": [[1218.952, 1267.192], [1215.827, 1291.542]], "color": "#ffa726", "lw": 1.4, "selected": false}, {"id": 96, "type": "LWPOLYLINE", "layer": "Hangar", "pts": [[1205.226, 1275.861], [1228.81, 1282.614]], "color": "#ffa726", "lw": 1.4, "selected": false}, {"id": 97, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1143.938, 1264.59], [1143.265, 1263.527]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 98, "type": "LWPOLYLINE", "layer": "Edging", "pts": [[1138.481, 1255.969], [1137.81, 1254.908]], "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 99, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1193.92, 1278.956], [1205.653, 1278.271]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 100, "type": "LWPOLYLINE", "layer": "BUILDING", "pts": [[1196.961, 1283.795], [1202.634, 1273.481]], "color": "#00bfff", "lw": 1.2, "selected": false}, {"id": 101, "type": "LWPOLYLINE", "layer": "0", "pts": [[1185.372, 1308.655], [1185.281, 1305.121]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 102, "type": "LWPOLYLINE", "layer": "0", "pts": [[1182.138, 1303.55], [1184.75, 1305.264]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 103, "type": "LWPOLYLINE", "layer": "0", "pts": [[1048.964, 1142.769], [1049.447, 1142.459], [1049.022, 1141.798], [1048.539, 1142.109]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 104, "type": "LWPOLYLINE", "layer": "0", "pts": [[1050.331, 1144.786], [1050.814, 1144.476], [1050.389, 1143.815], [1049.906, 1144.126]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 105, "type": "LWPOLYLINE", "layer": "0", "pts": [[1004.821, 1295.728], [1012.3, 1284.834], [1009.054, 1265.969], [951.92, 1178.747], [995.728, 1152.182], [1016.15, 1183.649], [1043.895, 1165.643], [1099.027, 1250.07], [1134.187, 1227.755]], "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 106, "type": "CIRCLE", "layer": "Edging", "cx": 1170.798, "cy": 1243.989, "r": 5.048, "color": "#00e676", "lw": 0.8, "selected": false}, {"id": 107, "type": "CIRCLE", "layer": "0", "cx": 38.592, "cy": 36.731, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 108, "type": "CIRCLE", "layer": "0", "cx": 58.583, "cy": 67.511, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 109, "type": "CIRCLE", "layer": "0", "cx": 1128.491, "cy": 1404.245, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 110, "type": "CIRCLE", "layer": "0", "cx": 1154.008, "cy": 1387.465, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 111, "type": "CIRCLE", "layer": "0", "cx": 1178.309, "cy": 1371.464, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 112, "type": "CIRCLE", "layer": "0", "cx": 1204.229, "cy": 1339.338, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 113, "type": "CIRCLE", "layer": "0", "cx": 1232.087, "cy": 1321.769, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 114, "type": "CIRCLE", "layer": "0", "cx": 1094.237, "cy": 1401.392, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 115, "type": "CIRCLE", "layer": "0", "cx": 1075.03, "cy": 1371.809, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 116, "type": "CIRCLE", "layer": "0", "cx": 1057.112, "cy": 1344.427, "r": 0.5, "color": "#c8c8c8", "lw": 0.5, "selected": false}, {"id": 117, "type": "POINT", "layer": "0", "x": 1158.745, "y": 1274.959, "rx": 363718.722, "ry": 3361272.975, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 118, "type": "POINT", "layer": "0", "x": 1159.492, "y": 1275.91, "rx": 363719.469, "ry": 3361272.024, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 119, "type": "POINT", "layer": "0", "x": 1160.471, "y": 1275.267, "rx": 363720.448, "ry": 3361272.667, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 120, "type": "POINT", "layer": "0", "x": 1161.42, "y": 1272.877, "rx": 363721.397, "ry": 3361275.057, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 121, "type": "POINT", "layer": "0", "x": 1159.074, "y": 1274.436, "rx": 363719.051, "ry": 3361273.498, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 122, "type": "POINT", "layer": "0", "x": 1152.641, "y": 1264.82, "rx": 363712.618, "ry": 3361283.114, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 123, "type": "POINT", "layer": "0", "x": 1146.6, "y": 1268.795, "rx": 363706.577, "ry": 3361279.139, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 124, "type": "POINT", "layer": "0", "x": 1152.614, "y": 1259.055, "rx": 363712.591, "ry": 3361288.879, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 125, "type": "POINT", "layer": "0", "x": 1143.837, "y": 1264.513, "rx": 363703.814, "ry": 3361283.421, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 126, "type": "POINT", "layer": "0", "x": 1143.186, "y": 1263.578, "rx": 363703.163, "ry": 3361284.356, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 127, "type": "POINT", "layer": "0", "x": 1147.065, "y": 1250.493, "rx": 363707.042, "ry": 3361297.441, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 128, "type": "POINT", "layer": "0", "x": 1138.273, "y": 1256.048, "rx": 363698.25, "ry": 3361291.886, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 129, "type": "POINT", "layer": "0", "x": 1137.619, "y": 1255.03, "rx": 363697.596, "ry": 3361292.904, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 130, "type": "POINT", "layer": "0", "x": 1133.028, "y": 1247.413, "rx": 363693.005, "ry": 3361300.521, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 131, "type": "POINT", "layer": "0", "x": 1141.455, "y": 1242.059, "rx": 363701.432, "ry": 3361305.875, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 132, "type": "POINT", "layer": "0", "x": 1104.425, "y": 1317.849, "rx": 363664.402, "ry": 3361230.085, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 133, "type": "POINT", "layer": "0", "x": 1103.908, "y": 1316.779, "rx": 363663.885, "ry": 3361231.155, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 134, "type": "POINT", "layer": "0", "x": 1104.795, "y": 1316.213, "rx": 363664.772, "ry": 3361231.721, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 135, "type": "POINT", "layer": "0", "x": 1074.575, "y": 1270.592, "rx": 363634.552, "ry": 3361277.342, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 136, "type": "POINT", "layer": "0", "x": 1099.027, "y": 1250.07, "rx": 363659.004, "ry": 3361297.864, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 137, "type": "POINT", "layer": "0", "x": 1118.82, "y": 1222.777, "rx": 363678.797, "ry": 3361325.157, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 138, "type": "POINT", "layer": "0", "x": 1116.699, "y": 1219.714, "rx": 363676.676, "ry": 3361328.22, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 139, "type": "POINT", "layer": "0", "x": 1115.279, "y": 1220.697, "rx": 363675.256, "ry": 3361327.237, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 140, "type": "POINT", "layer": "0", "x": 1105.701, "y": 1201.331, "rx": 363665.678, "ry": 3361346.603, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 141, "type": "POINT", "layer": "0", "x": 1104.17, "y": 1199.0, "rx": 363664.147, "ry": 3361348.934, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 142, "type": "POINT", "layer": "0", "x": 1102.046, "y": 1200.395, "rx": 363662.023, "ry": 3361347.539, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 143, "type": "POINT", "layer": "0", "x": 1094.073, "y": 1182.343, "rx": 363654.05, "ry": 3361365.591, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 144, "type": "POINT", "layer": "0", "x": 1091.268, "y": 1184.053, "rx": 363651.245, "ry": 3361363.881, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 145, "type": "POINT", "layer": "0", "x": 1087.667, "y": 1178.52, "rx": 363647.644, "ry": 3361369.414, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 146, "type": "POINT", "layer": "0", "x": 1043.895, "y": 1165.643, "rx": 363603.872, "ry": 3361382.291, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 147, "type": "POINT", "layer": "0", "x": 1021.719, "y": 1180.035, "rx": 363581.696, "ry": 3361367.899, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 148, "type": "POINT", "layer": "0", "x": 1022.345, "y": 1132.001, "rx": 363582.322, "ry": 3361415.933, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 149, "type": "POINT", "layer": "0", "x": 1017.759, "y": 1125.079, "rx": 363577.736, "ry": 3361422.855, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 150, "type": "POINT", "layer": "0", "x": 998.234, "y": 1138.044, "rx": 363558.211, "ry": 3361409.89, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 151, "type": "POINT", "layer": "0", "x": 997.542, "y": 1142.154, "rx": 363557.519, "ry": 3361405.78, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 152, "type": "POINT", "layer": "0", "x": 986.883, "y": 1147.134, "rx": 363546.86, "ry": 3361400.8, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 153, "type": "POINT", "layer": "0", "x": 991.771, "y": 1146.084, "rx": 363551.748, "ry": 3361401.85, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 154, "type": "POINT", "layer": "0", "x": 995.54, "y": 1152.296, "rx": 363555.517, "ry": 3361395.638, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 155, "type": "POINT", "layer": "0", "x": 943.691, "y": 1175.196, "rx": 363503.668, "ry": 3361372.738, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 156, "type": "POINT", "layer": "0", "x": 951.92, "y": 1178.747, "rx": 363511.897, "ry": 3361369.187, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 157, "type": "POINT", "layer": "0", "x": 1009.054, "y": 1265.969, "rx": 363569.031, "ry": 3361281.965, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 158, "type": "POINT", "layer": "0", "x": 1012.3, "y": 1284.834, "rx": 363572.277, "ry": 3361263.1, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 159, "type": "POINT", "layer": "0", "x": 1004.821, "y": 1295.728, "rx": 363564.798, "ry": 3361252.206, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 160, "type": "POINT", "layer": "0", "x": 1017.676, "y": 1315.238, "rx": 363577.653, "ry": 3361232.696, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 161, "type": "POINT", "layer": "0", "x": 1036.452, "y": 1313.891, "rx": 363596.429, "ry": 3361234.043, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 162, "type": "POINT", "layer": "0", "x": 1047.222, "y": 1322.129, "rx": 363607.199, "ry": 3361225.805, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 163, "type": "POINT", "layer": "0", "x": 1080.789, "y": 1372.951, "rx": 363640.766, "ry": 3361174.983, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 164, "type": "POINT", "layer": "0", "x": 1106.706, "y": 1412.647, "rx": 363666.683, "ry": 3361135.287, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 165, "type": "POINT", "layer": "0", "x": 1165.636, "y": 1373.894, "rx": 363725.613, "ry": 3361174.04, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 166, "type": "POINT", "layer": "0", "x": 1173.143, "y": 1368.854, "rx": 363733.12, "ry": 3361179.08, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 167, "type": "POINT", "layer": "0", "x": 1205.265, "y": 1347.804, "rx": 363765.242, "ry": 3361200.13, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 168, "type": "POINT", "layer": "0", "x": 1204.229, "y": 1339.338, "rx": 363764.206, "ry": 3361208.596, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 169, "type": "POINT", "layer": "0", "x": 1198.742, "y": 1326.643, "rx": 363758.719, "ry": 3361221.291, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 170, "type": "POINT", "layer": "0", "x": 1202.79, "y": 1333.688, "rx": 363762.767, "ry": 3361214.246, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 171, "type": "POINT", "layer": "0", "x": 1222.756, "y": 1321.105, "rx": 363782.733, "ry": 3361226.829, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 172, "type": "POINT", "layer": "0", "x": 1220.473, "y": 1317.723, "rx": 363780.45, "ry": 3361230.211, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 173, "type": "POINT", "layer": "0", "x": 1218.161, "y": 1314.346, "rx": 363778.138, "ry": 3361233.588, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 174, "type": "POINT", "layer": "0", "x": 1211.513, "y": 1318.178, "rx": 363771.49, "ry": 3361229.756, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 175, "type": "POINT", "layer": "0", "x": 1196.71, "y": 1311.335, "rx": 363756.687, "ry": 3361236.599, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 176, "type": "POINT", "layer": "0", "x": 1204.218, "y": 1306.368, "rx": 363764.195, "ry": 3361241.566, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 177, "type": "POINT", "layer": "0", "x": 1202.557, "y": 1303.654, "rx": 363762.534, "ry": 3361244.28, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 178, "type": "POINT", "layer": "0", "x": 1207.409, "y": 1303.055, "rx": 363767.386, "ry": 3361244.879, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 179, "type": "POINT", "layer": "0", "x": 1204.935, "y": 1298.55, "rx": 363764.912, "ry": 3361249.384, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 180, "type": "POINT", "layer": "0", "x": 1205.399, "y": 1299.665, "rx": 363765.376, "ry": 3361248.269, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 181, "type": "POINT", "layer": "0", "x": 1215.827, "y": 1291.542, "rx": 363775.804, "ry": 3361256.392, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 182, "type": "POINT", "layer": "0", "x": 1224.345, "y": 1288.433, "rx": 363784.322, "ry": 3361259.501, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 183, "type": "POINT", "layer": "0", "x": 1230.101, "y": 1283.095, "rx": 363790.078, "ry": 3361264.839, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 184, "type": "POINT", "layer": "0", "x": 1228.81, "y": 1282.614, "rx": 363788.787, "ry": 3361265.32, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 185, "type": "POINT", "layer": "0", "x": 1195.082, "y": 1258.956, "rx": 363755.059, "ry": 3361288.978, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 186, "type": "POINT", "layer": "0", "x": 1195.296, "y": 1258.215, "rx": 363755.273, "ry": 3361289.719, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 187, "type": "POINT", "layer": "0", "x": 1192.084, "y": 1254.201, "rx": 363752.061, "ry": 3361293.733, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 188, "type": "POINT", "layer": "0", "x": 1192.233, "y": 1253.293, "rx": 363752.21, "ry": 3361294.641, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 189, "type": "POINT", "layer": "0", "x": 1195.594, "y": 1248.987, "rx": 363755.571, "ry": 3361298.947, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 190, "type": "POINT", "layer": "0", "x": 1195.424, "y": 1251.074, "rx": 363755.401, "ry": 3361296.86, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 191, "type": "POINT", "layer": "0", "x": 1196.558, "y": 1250.449, "rx": 363756.535, "ry": 3361297.485, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 192, "type": "POINT", "layer": "0", "x": 1199.214, "y": 1245.687, "rx": 363759.191, "ry": 3361302.247, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 193, "type": "POINT", "layer": "0", "x": 1205.44, "y": 1253.104, "rx": 363765.417, "ry": 3361294.83, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 194, "type": "POINT", "layer": "0", "x": 1204.107, "y": 1251.723, "rx": 363764.084, "ry": 3361296.211, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 195, "type": "POINT", "layer": "0", "x": 1202.175, "y": 1252.267, "rx": 363762.152, "ry": 3361295.667, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 196, "type": "POINT", "layer": "0", "x": 1201.436, "y": 1252.961, "rx": 363761.413, "ry": 3361294.973, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 197, "type": "POINT", "layer": "0", "x": 1201.997, "y": 1253.797, "rx": 363761.974, "ry": 3361294.137, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 198, "type": "POINT", "layer": "0", "x": 1203.883, "y": 1242.58, "rx": 363763.86, "ry": 3361305.354, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 199, "type": "POINT", "layer": "0", "x": 1208.119, "y": 1257.489, "rx": 363768.096, "ry": 3361290.445, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 200, "type": "POINT", "layer": "0", "x": 1209.255, "y": 1259.228, "rx": 363769.232, "ry": 3361288.706, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 201, "type": "POINT", "layer": "0", "x": 1211.252, "y": 1257.923, "rx": 363771.229, "ry": 3361290.011, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 202, "type": "POINT", "layer": "0", "x": 1218.952, "y": 1267.192, "rx": 363778.929, "ry": 3361280.742, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 203, "type": "POINT", "layer": "0", "x": 1205.226, "y": 1275.861, "rx": 363765.203, "ry": 3361272.073, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 204, "type": "POINT", "layer": "0", "x": 1202.751, "y": 1273.407, "rx": 363762.728, "ry": 3361274.527, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 205, "type": "POINT", "layer": "0", "x": 1205.653, "y": 1278.271, "rx": 363765.63, "ry": 3361269.663, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 206, "type": "POINT", "layer": "0", "x": 1194.961, "y": 1280.613, "rx": 363754.938, "ry": 3361267.321, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 207, "type": "POINT", "layer": "0", "x": 1196.961, "y": 1283.795, "rx": 363756.938, "ry": 3361264.139, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 208, "type": "POINT", "layer": "0", "x": 1191.027, "y": 1279.478, "rx": 363751.004, "ry": 3361268.456, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 209, "type": "POINT", "layer": "0", "x": 1182.244, "y": 1284.792, "rx": 363742.221, "ry": 3361263.142, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 210, "type": "POINT", "layer": "0", "x": 1188.542, "y": 1295.202, "rx": 363748.519, "ry": 3361252.732, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 211, "type": "POINT", "layer": "0", "x": 1186.858, "y": 1310.863, "rx": 363746.835, "ry": 3361237.071, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 212, "type": "POINT", "layer": "0", "x": 1185.372, "y": 1308.655, "rx": 363745.349, "ry": 3361239.279, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 213, "type": "POINT", "layer": "0", "x": 1182.138, "y": 1303.55, "rx": 363742.115, "ry": 3361244.384, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 214, "type": "POINT", "layer": "0", "x": 1192.378, "y": 1256.148, "rx": 363752.355, "ry": 3361291.786, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 215, "type": "POINT", "layer": "0", "x": 1191.837, "y": 1256.348, "rx": 363751.814, "ry": 3361291.586, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 216, "type": "POINT", "layer": "0", "x": 1187.465, "y": 1256.751, "rx": 363747.442, "ry": 3361291.183, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 217, "type": "POINT", "layer": "0", "x": 1185.532, "y": 1258.02, "rx": 363745.509, "ry": 3361289.914, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 218, "type": "POINT", "layer": "0", "x": 1183.244, "y": 1261.965, "rx": 363743.221, "ry": 3361285.969, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 219, "type": "POINT", "layer": "0", "x": 1185.681, "y": 1266.256, "rx": 363745.658, "ry": 3361281.678, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 220, "type": "POINT", "layer": "0", "x": 1184.579, "y": 1266.285, "rx": 363744.556, "ry": 3361281.649, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 221, "type": "POINT", "layer": "0", "x": 1174.809, "y": 1272.327, "rx": 363734.786, "ry": 3361275.607, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 222, "type": "POINT", "layer": "0", "x": 1166.141, "y": 1277.847, "rx": 363726.118, "ry": 3361270.087, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 223, "type": "POINT", "layer": "0", "x": 1162.441, "y": 1271.985, "rx": 363722.418, "ry": 3361275.949, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 224, "type": "POINT", "layer": "0", "x": 1166.262, "y": 1263.459, "rx": 363726.239, "ry": 3361284.475, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 225, "type": "POINT", "layer": "0", "x": 1169.996, "y": 1255.721, "rx": 363729.973, "ry": 3361292.213, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 226, "type": "POINT", "layer": "0", "x": 1170.17, "y": 1255.583, "rx": 363730.147, "ry": 3361292.351, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 227, "type": "POINT", "layer": "0", "x": 1175.204, "y": 1252.134, "rx": 363735.181, "ry": 3361295.8, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 228, "type": "POINT", "layer": "0", "x": 1174.945, "y": 1252.404, "rx": 363734.922, "ry": 3361295.53, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 229, "type": "POINT", "layer": "0", "x": 1177.123, "y": 1255.499, "rx": 363737.1, "ry": 3361292.435, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 230, "type": "POINT", "layer": "0", "x": 1177.298, "y": 1255.33, "rx": 363737.275, "ry": 3361292.604, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 231, "type": "POINT", "layer": "0", "x": 1182.04, "y": 1252.099, "rx": 363742.017, "ry": 3361295.835, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 232, "type": "POINT", "layer": "0", "x": 1182.154, "y": 1252.413, "rx": 363742.131, "ry": 3361295.521, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 233, "type": "POINT", "layer": "0", "x": 1186.75, "y": 1247.357, "rx": 363746.727, "ry": 3361300.577, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 234, "type": "POINT", "layer": "0", "x": 1171.658, "y": 1239.015, "rx": 363731.635, "ry": 3361308.919, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 235, "type": "POINT", "layer": "0", "x": 1175.101, "y": 1246.627, "rx": 363735.078, "ry": 3361301.307, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 236, "type": "POINT", "layer": "0", "x": 1167.033, "y": 1247.351, "rx": 363727.01, "ry": 3361300.583, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 237, "type": "POINT", "layer": "0", "x": 1159.229, "y": 1253.836, "rx": 363719.206, "ry": 3361294.098, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 238, "type": "POINT", "layer": "0", "x": 1153.358, "y": 1257.752, "rx": 363713.335, "ry": 3361290.182, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 239, "type": "POINT", "layer": "0", "x": 1146.45, "y": 1241.544, "rx": 363706.427, "ry": 3361306.39, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 240, "type": "POINT", "layer": "0", "x": 1145.936, "y": 1240.617, "rx": 363705.913, "ry": 3361307.317, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 241, "type": "POINT", "layer": "0", "x": 1146.806, "y": 1240.032, "rx": 363706.783, "ry": 3361307.902, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 242, "type": "POINT", "layer": "0", "x": 1151.137, "y": 1236.965, "rx": 363711.114, "ry": 3361310.969, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 243, "type": "POINT", "layer": "0", "x": 1152.027, "y": 1236.35, "rx": 363712.004, "ry": 3361311.584, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 244, "type": "POINT", "layer": "0", "x": 1152.554, "y": 1237.107, "rx": 363712.531, "ry": 3361310.827, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 245, "type": "POINT", "layer": "0", "x": 1161.446, "y": 1231.358, "rx": 363721.423, "ry": 3361316.576, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 246, "type": "POINT", "layer": "0", "x": 1172.477, "y": 1224.464, "rx": 363732.454, "ry": 3361323.47, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 247, "type": "POINT", "layer": "0", "x": 1164.791, "y": 1212.459, "rx": 363724.768, "ry": 3361335.475, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 248, "type": "POINT", "layer": "0", "x": 1149.488, "y": 1220.543, "rx": 363709.465, "ry": 3361327.391, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 249, "type": "POINT", "layer": "0", "x": 1135.613, "y": 1214.136, "rx": 363695.59, "ry": 3361333.798, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 250, "type": "POINT", "layer": "0", "x": 1135.065, "y": 1213.264, "rx": 363695.042, "ry": 3361334.67, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 251, "type": "POINT", "layer": "0", "x": 1136.014, "y": 1212.796, "rx": 363695.991, "ry": 3361335.138, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 252, "type": "POINT", "layer": "0", "x": 1124.216, "y": 1196.709, "rx": 363684.193, "ry": 3361351.225, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 253, "type": "POINT", "layer": "0", "x": 1124.891, "y": 1196.012, "rx": 363684.868, "ry": 3361351.922, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 254, "type": "POINT", "layer": "0", "x": 1124.493, "y": 1195.401, "rx": 363684.47, "ry": 3361352.533, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 255, "type": "POINT", "layer": "0", "x": 1128.811, "y": 1219.285, "rx": 363688.788, "ry": 3361328.649, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 256, "type": "POINT", "layer": "0", "x": 1139.136, "y": 1235.515, "rx": 363699.113, "ry": 3361312.419, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 257, "type": "POINT", "layer": "0", "x": 1135.842, "y": 1230.363, "rx": 363695.819, "ry": 3361317.571, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 258, "type": "POINT", "layer": "0", "x": 1157.741, "y": 1200.264, "rx": 363717.718, "ry": 3361347.67, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 259, "type": "POINT", "layer": "0", "x": 1140.692, "y": 1211.079, "rx": 363700.669, "ry": 3361336.855, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 260, "type": "POINT", "layer": "0", "x": 1136.869, "y": 1213.554, "rx": 363696.846, "ry": 3361334.38, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 261, "type": "POINT", "layer": "0", "x": 1128.477, "y": 1218.978, "rx": 363688.454, "ry": 3361328.956, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 262, "type": "POINT", "layer": "0", "x": 1124.083, "y": 1221.686, "rx": 363684.06, "ry": 3361326.248, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 263, "type": "POINT", "layer": "0", "x": 1122.123, "y": 1221.221, "rx": 363682.1, "ry": 3361326.713, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 264, "type": "POINT", "layer": "0", "x": 1113.019, "y": 1161.524, "rx": 363672.996, "ry": 3361386.41, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 265, "type": "POINT", "layer": "0", "x": 1108.369, "y": 1164.838, "rx": 363668.346, "ry": 3361383.096, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 266, "type": "POINT", "layer": "0", "x": 1095.832, "y": 1181.181, "rx": 363655.809, "ry": 3361366.753, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 267, "type": "POINT", "layer": "0", "x": 1106.948, "y": 1173.718, "rx": 363666.925, "ry": 3361374.216, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 268, "type": "POINT", "layer": "0", "x": 1099.774, "y": 1162.909, "rx": 363659.751, "ry": 3361385.025, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 269, "type": "POINT", "layer": "0", "x": 1085.919, "y": 1171.906, "rx": 363645.896, "ry": 3361376.028, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 270, "type": "POINT", "layer": "0", "x": 1069.326, "y": 1146.986, "rx": 363629.303, "ry": 3361400.948, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 271, "type": "POINT", "layer": "0", "x": 1066.121, "y": 1146.844, "rx": 363626.098, "ry": 3361401.09, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 272, "type": "POINT", "layer": "0", "x": 1065.923, "y": 1148.732, "rx": 363625.9, "ry": 3361399.202, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 273, "type": "POINT", "layer": "0", "x": 1061.374, "y": 1142.177, "rx": 363621.351, "ry": 3361405.757, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 274, "type": "POINT", "layer": "0", "x": 1063.15, "y": 1142.047, "rx": 363623.127, "ry": 3361405.887, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 275, "type": "POINT", "layer": "0", "x": 1069.934, "y": 1137.606, "rx": 363629.911, "ry": 3361410.328, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 276, "type": "POINT", "layer": "0", "x": 1056.515, "y": 1129.235, "rx": 363616.492, "ry": 3361418.699, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 277, "type": "POINT", "layer": "0", "x": 1055.172, "y": 1125.386, "rx": 363615.149, "ry": 3361422.548, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 278, "type": "POINT", "layer": "0", "x": 1057.789, "y": 1123.693, "rx": 363617.766, "ry": 3361424.241, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 279, "type": "POINT", "layer": "0", "x": 1063.715, "y": 1132.926, "rx": 363623.692, "ry": 3361415.008, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 280, "type": "POINT", "layer": "0", "x": 1060.374, "y": 1135.15, "rx": 363620.351, "ry": 3361412.784, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 281, "type": "POINT", "layer": "0", "x": 1048.539, "y": 1142.109, "rx": 363608.516, "ry": 3361405.825, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 282, "type": "POINT", "layer": "0", "x": 1048.606, "y": 1143.0, "rx": 363608.583, "ry": 3361404.934, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 283, "type": "POINT", "layer": "0", "x": 1049.973, "y": 1145.017, "rx": 363609.95, "ry": 3361402.917, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 284, "type": "POINT", "layer": "0", "x": 1049.906, "y": 1144.126, "rx": 363609.883, "ry": 3361403.808, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 285, "type": "POINT", "layer": "0", "x": 1050.563, "y": 1148.856, "rx": 363610.54, "ry": 3361399.078, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 286, "type": "POINT", "layer": "0", "x": 1034.7, "y": 1124.224, "rx": 363594.677, "ry": 3361423.71, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 287, "type": "POINT", "layer": "0", "x": 1045.242, "y": 1116.876, "rx": 363605.219, "ry": 3361431.058, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 288, "type": "POINT", "layer": "0", "x": 962.781, "y": 1103.783, "rx": 363522.758, "ry": 3361444.151, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 289, "type": "POINT", "layer": "0", "x": 910.989, "y": 1139.054, "rx": 363470.966, "ry": 3361408.88, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 290, "type": "POINT", "layer": "0", "x": 917.059, "y": 1132.37, "rx": 363477.036, "ry": 3361415.564, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 291, "type": "POINT", "layer": "0", "x": 923.046, "y": 1126.356, "rx": 363483.023, "ry": 3361421.578, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 292, "type": "POINT", "layer": "0", "x": 1000.685, "y": 1071.401, "rx": 363560.662, "ry": 3361476.533, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 293, "type": "POINT", "layer": "0", "x": 1003.508, "y": 1076.833, "rx": 363563.485, "ry": 3361471.101, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 294, "type": "POINT", "layer": "0", "x": 1005.681, "y": 1079.987, "rx": 363565.658, "ry": 3361467.947, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 295, "type": "POINT", "layer": "0", "x": 1011.199, "y": 1088.15, "rx": 363571.176, "ry": 3361459.784, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 296, "type": "POINT", "layer": "0", "x": 1022.41, "y": 1081.422, "rx": 363582.387, "ry": 3361466.512, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 297, "type": "POINT", "layer": "0", "x": 1108.518, "y": 1096.494, "rx": 363668.495, "ry": 3361451.44, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 298, "type": "POINT", "layer": "0", "x": 1108.518, "y": 1096.494, "rx": 363668.495, "ry": 3361451.44, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 299, "type": "POINT", "layer": "0", "x": 1030.387, "y": 1226.39, "rx": 363590.364, "ry": 3361321.544, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 300, "type": "POINT", "layer": "0", "x": 989.678, "y": 1190.893, "rx": 363549.655, "ry": 3361357.041, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 301, "type": "POINT", "layer": "0", "x": 1129.894, "y": 1346.911, "rx": 363689.871, "ry": 3361201.023, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 302, "type": "POINT", "layer": "0", "x": 1161.818, "y": 1328.509, "rx": 363721.795, "ry": 3361219.425, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 303, "type": "POINT", "layer": "0", "x": 973.131, "y": 1123.964, "rx": 363533.108, "ry": 3361423.97, "color": "#ff00ff", "lw": 0.5, "selected": false}, {"id": 304, "type": "TEXT", "layer": "Point_ID", "x": 1158.995, "y": 1274.709, "text": "190", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 305, "type": "TEXT", "layer": "Point_ID", "x": 1159.742, "y": 1275.66, "text": "189", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 306, "type": "TEXT", "layer": "Point_ID", "x": 1160.721, "y": 1275.017, "text": "188", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 307, "type": "TEXT", "layer": "Point_ID", "x": 1161.67, "y": 1272.627, "text": "187", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 308, "type": "TEXT", "layer": "Point_ID", "x": 1159.324, "y": 1274.186, "text": "186", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 309, "type": "TEXT", "layer": "Point_ID", "x": 1152.891, "y": 1264.57, "text": "185", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 310, "type": "TEXT", "layer": "Point_ID", "x": 1146.85, "y": 1268.545, "text": "184", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 311, "type": "TEXT", "layer": "Point_ID", "x": 1152.864, "y": 1258.805, "text": "183", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 312, "type": "TEXT", "layer": "Point_ID", "x": 1144.087, "y": 1264.263, "text": "182", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 313, "type": "TEXT", "layer": "Point_ID", "x": 1143.436, "y": 1263.328, "text": "181", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 314, "type": "TEXT", "layer": "Point_ID", "x": 1147.315, "y": 1250.243, "text": "180", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 315, "type": "TEXT", "layer": "Point_ID", "x": 1138.523, "y": 1255.798, "text": "179", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 316, "type": "TEXT", "layer": "Point_ID", "x": 1137.869, "y": 1254.78, "text": "178", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 317, "type": "TEXT", "layer": "Point_ID", "x": 1133.278, "y": 1247.163, "text": "177", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 318, "type": "TEXT", "layer": "Point_ID", "x": 1141.705, "y": 1241.809, "text": "176", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 319, "type": "TEXT", "layer": "Point_ID", "x": 1104.675, "y": 1317.599, "text": "175", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 320, "type": "TEXT", "layer": "Point_ID", "x": 1104.158, "y": 1316.529, "text": "174", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 321, "type": "TEXT", "layer": "Point_ID", "x": 1105.045, "y": 1315.963, "text": "173", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 322, "type": "TEXT", "layer": "Point_ID", "x": 1074.825, "y": 1270.342, "text": "172", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 323, "type": "TEXT", "layer": "Point_ID", "x": 1099.277, "y": 1249.82, "text": "171", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 324, "type": "TEXT", "layer": "Point_ID", "x": 1119.07, "y": 1222.527, "text": "170", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 325, "type": "TEXT", "layer": "Point_ID", "x": 1116.949, "y": 1219.464, "text": "169", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 326, "type": "TEXT", "layer": "Point_ID", "x": 1115.356, "y": 1220.197, "text": "168", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 327, "type": "TEXT", "layer": "Point_ID", "x": 1105.951, "y": 1201.081, "text": "167", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 328, "type": "TEXT", "layer": "Point_ID", "x": 1101.861, "y": 1198.69, "text": "166", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 329, "type": "TEXT", "layer": "Point_ID", "x": 1099.97, "y": 1200.256, "text": "165", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 330, "type": "TEXT", "layer": "Point_ID", "x": 1094.323, "y": 1182.093, "text": "164", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 331, "type": "TEXT", "layer": "Point_ID", "x": 1091.518, "y": 1183.803, "text": "163", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 332, "type": "TEXT", "layer": "Point_ID", "x": 1087.917, "y": 1178.27, "text": "162", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 333, "type": "TEXT", "layer": "Point_ID", "x": 1044.145, "y": 1165.393, "text": "161", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 334, "type": "TEXT", "layer": "Point_ID", "x": 1021.969, "y": 1179.785, "text": "160", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 335, "type": "TEXT", "layer": "Point_ID", "x": 1022.595, "y": 1131.751, "text": "159", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 336, "type": "TEXT", "layer": "Point_ID", "x": 1018.009, "y": 1124.829, "text": "158", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 337, "type": "TEXT", "layer": "Point_ID", "x": 998.484, "y": 1137.794, "text": "157", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 338, "type": "TEXT", "layer": "Point_ID", "x": 997.792, "y": 1141.904, "text": "156", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 339, "type": "TEXT", "layer": "Point_ID", "x": 987.133, "y": 1146.884, "text": "155", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 340, "type": "TEXT", "layer": "Point_ID", "x": 992.021, "y": 1145.834, "text": "154", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 341, "type": "TEXT", "layer": "Point_ID", "x": 995.79, "y": 1152.046, "text": "153", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 342, "type": "TEXT", "layer": "Point_ID", "x": 943.941, "y": 1174.946, "text": "152", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 343, "type": "TEXT", "layer": "Point_ID", "x": 952.17, "y": 1178.497, "text": "151", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 344, "type": "TEXT", "layer": "Point_ID", "x": 1009.304, "y": 1265.719, "text": "150", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 345, "type": "TEXT", "layer": "Point_ID", "x": 1012.55, "y": 1284.584, "text": "149", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 346, "type": "TEXT", "layer": "Point_ID", "x": 1005.071, "y": 1295.478, "text": "148", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 347, "type": "TEXT", "layer": "Point_ID", "x": 1017.926, "y": 1314.988, "text": "147", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 348, "type": "TEXT", "layer": "Point_ID", "x": 1036.702, "y": 1313.641, "text": "146", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 349, "type": "TEXT", "layer": "Point_ID", "x": 1047.472, "y": 1321.879, "text": "145", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 350, "type": "TEXT", "layer": "Point_ID", "x": 1081.039, "y": 1372.701, "text": "144", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 351, "type": "TEXT", "layer": "Point_ID", "x": 1106.956, "y": 1412.397, "text": "143", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 352, "type": "TEXT", "layer": "Point_ID", "x": 1165.886, "y": 1373.644, "text": "142", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 353, "type": "TEXT", "layer": "Point_ID", "x": 1173.393, "y": 1368.604, "text": "141", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 354, "type": "TEXT", "layer": "Point_ID", "x": 1205.515, "y": 1347.554, "text": "140", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 355, "type": "TEXT", "layer": "Point_ID", "x": 1204.479, "y": 1339.088, "text": "139", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 356, "type": "TEXT", "layer": "Point_ID", "x": 1198.992, "y": 1326.393, "text": "138", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 357, "type": "TEXT", "layer": "Point_ID", "x": 1203.04, "y": 1333.438, "text": "137", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 358, "type": "TEXT", "layer": "Point_ID", "x": 1223.006, "y": 1320.855, "text": "136", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 359, "type": "TEXT", "layer": "Point_ID", "x": 1220.723, "y": 1317.473, "text": "135", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 360, "type": "TEXT", "layer": "Point_ID", "x": 1218.411, "y": 1314.096, "text": "134", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 361, "type": "TEXT", "layer": "Point_ID", "x": 1211.763, "y": 1317.928, "text": "133", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 362, "type": "TEXT", "layer": "Point_ID", "x": 1196.96, "y": 1311.085, "text": "132", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 363, "type": "TEXT", "layer": "Point_ID", "x": 1204.468, "y": 1306.118, "text": "131", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 364, "type": "TEXT", "layer": "Point_ID", "x": 1202.807, "y": 1303.404, "text": "130", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 365, "type": "TEXT", "layer": "Point_ID", "x": 1207.082, "y": 1303.147, "text": "129", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 366, "type": "TEXT", "layer": "Point_ID", "x": 1205.185, "y": 1298.3, "text": "128", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 367, "type": "TEXT", "layer": "Point_ID", "x": 1205.649, "y": 1299.415, "text": "127", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 368, "type": "TEXT", "layer": "Point_ID", "x": 1216.077, "y": 1291.292, "text": "126", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 369, "type": "TEXT", "layer": "Point_ID", "x": 1224.595, "y": 1288.183, "text": "125", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 370, "type": "TEXT", "layer": "Point_ID", "x": 1230.351, "y": 1282.845, "text": "124", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 371, "type": "TEXT", "layer": "Point_ID", "x": 1229.06, "y": 1282.364, "text": "123", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 372, "type": "TEXT", "layer": "Point_ID", "x": 1195.332, "y": 1258.706, "text": "122", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 373, "type": "TEXT", "layer": "Point_ID", "x": 1195.207, "y": 1258.152, "text": "121", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 374, "type": "TEXT", "layer": "Point_ID", "x": 1195.489, "y": 1257.941, "text": "120", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 375, "type": "TEXT", "layer": "Point_ID", "x": 1192.334, "y": 1253.951, "text": "119", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 376, "type": "TEXT", "layer": "Point_ID", "x": 1191.953, "y": 1253.375, "text": "118", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 377, "type": "TEXT", "layer": "Point_ID", "x": 1192.483, "y": 1253.043, "text": "117", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 378, "type": "TEXT", "layer": "Point_ID", "x": 1195.844, "y": 1248.737, "text": "116", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 379, "type": "TEXT", "layer": "Point_ID", "x": 1194.552, "y": 1248.867, "text": "115", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 380, "type": "TEXT", "layer": "Point_ID", "x": 1194.996, "y": 1249.496, "text": "114", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 381, "type": "TEXT", "layer": "Point_ID", "x": 1195.674, "y": 1250.824, "text": "113", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 382, "type": "TEXT", "layer": "Point_ID", "x": 1196.808, "y": 1250.199, "text": "112", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 383, "type": "TEXT", "layer": "Point_ID", "x": 1197.224, "y": 1251.043, "text": "111", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 384, "type": "TEXT", "layer": "Point_ID", "x": 1199.464, "y": 1245.437, "text": "110", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 385, "type": "TEXT", "layer": "Point_ID", "x": 1205.69, "y": 1252.854, "text": "109", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 386, "type": "TEXT", "layer": "Point_ID", "x": 1204.357, "y": 1251.473, "text": "108", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 387, "type": "TEXT", "layer": "Point_ID", "x": 1202.963, "y": 1252.412, "text": "107", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 388, "type": "TEXT", "layer": "Point_ID", "x": 1202.425, "y": 1252.017, "text": "106", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 389, "type": "TEXT", "layer": "Point_ID", "x": 1201.686, "y": 1252.711, "text": "105", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 390, "type": "TEXT", "layer": "Point_ID", "x": 1202.247, "y": 1253.547, "text": "104", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 391, "type": "TEXT", "layer": "Point_ID", "x": 1204.712, "y": 1243.609, "text": "103", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 392, "type": "TEXT", "layer": "Point_ID", "x": 1208.566, "y": 1257.11, "text": "102", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 393, "type": "TEXT", "layer": "Point_ID", "x": 1209.273, "y": 1260.218, "text": "101", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 394, "type": "TEXT", "layer": "Point_ID", "x": 1211.593, "y": 1257.813, "text": "100", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 395, "type": "TEXT", "layer": "Point_ID", "x": 1219.202, "y": 1266.942, "text": "99", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 396, "type": "TEXT", "layer": "Point_ID", "x": 1205.476, "y": 1275.611, "text": "98", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 397, "type": "TEXT", "layer": "Point_ID", "x": 1203.001, "y": 1273.157, "text": "97", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 398, "type": "TEXT", "layer": "Point_ID", "x": 1205.903, "y": 1278.021, "text": "96", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 399, "type": "TEXT", "layer": "Point_ID", "x": 1195.211, "y": 1280.363, "text": "95", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 400, "type": "TEXT", "layer": "Point_ID", "x": 1197.057, "y": 1283.643, "text": "94", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 401, "type": "TEXT", "layer": "Point_ID", "x": 1191.006, "y": 1278.781, "text": "93", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 402, "type": "TEXT", "layer": "Point_ID", "x": 1182.494, "y": 1284.542, "text": "92", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 403, "type": "TEXT", "layer": "Point_ID", "x": 1188.792, "y": 1294.952, "text": "91", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 404, "type": "TEXT", "layer": "Point_ID", "x": 1187.108, "y": 1310.613, "text": "90", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 405, "type": "TEXT", "layer": "Point_ID", "x": 1185.622, "y": 1308.405, "text": "89", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 406, "type": "TEXT", "layer": "Point_ID", "x": 1182.388, "y": 1303.3, "text": "88", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 407, "type": "TEXT", "layer": "Point_ID", "x": 1192.628, "y": 1255.898, "text": "87", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 408, "type": "TEXT", "layer": "Point_ID", "x": 1192.087, "y": 1256.098, "text": "86", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 409, "type": "TEXT", "layer": "Point_ID", "x": 1187.715, "y": 1256.501, "text": "85", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 410, "type": "TEXT", "layer": "Point_ID", "x": 1185.782, "y": 1257.77, "text": "84", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 411, "type": "TEXT", "layer": "Point_ID", "x": 1183.494, "y": 1261.715, "text": "83", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 412, "type": "TEXT", "layer": "Point_ID", "x": 1185.931, "y": 1266.006, "text": "82", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 413, "type": "TEXT", "layer": "Point_ID", "x": 1184.829, "y": 1266.035, "text": "81", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 414, "type": "TEXT", "layer": "Point_ID", "x": 1175.059, "y": 1272.077, "text": "80", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 415, "type": "TEXT", "layer": "Point_ID", "x": 1166.391, "y": 1277.597, "text": "79", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 416, "type": "TEXT", "layer": "Point_ID", "x": 1162.691, "y": 1271.735, "text": "78", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 417, "type": "TEXT", "layer": "Point_ID", "x": 1166.512, "y": 1263.209, "text": "77", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 418, "type": "TEXT", "layer": "Point_ID", "x": 1170.083, "y": 1256.766, "text": "76", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 419, "type": "TEXT", "layer": "Point_ID", "x": 1169.344, "y": 1254.364, "text": "74", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 420, "type": "TEXT", "layer": "Point_ID", "x": 1175.454, "y": 1251.884, "text": "73", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 421, "type": "TEXT", "layer": "Point_ID", "x": 1175.195, "y": 1252.154, "text": "72", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 422, "type": "TEXT", "layer": "Point_ID", "x": 1175.282, "y": 1252.427, "text": "71", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 423, "type": "TEXT", "layer": "Point_ID", "x": 1177.373, "y": 1255.249, "text": "70", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 424, "type": "TEXT", "layer": "Point_ID", "x": 1177.548, "y": 1255.08, "text": "69", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 425, "type": "TEXT", "layer": "Point_ID", "x": 1177.744, "y": 1255.38, "text": "68", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 426, "type": "TEXT", "layer": "Point_ID", "x": 1182.103, "y": 1251.907, "text": "67", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 427, "type": "TEXT", "layer": "Point_ID", "x": 1182.29, "y": 1251.849, "text": "66", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 428, "type": "TEXT", "layer": "Point_ID", "x": 1182.404, "y": 1252.163, "text": "65", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 429, "type": "TEXT", "layer": "Point_ID", "x": 1187.0, "y": 1247.107, "text": "64", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 430, "type": "TEXT", "layer": "Point_ID", "x": 1171.908, "y": 1238.765, "text": "63", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 431, "type": "TEXT", "layer": "Point_ID", "x": 1175.351, "y": 1246.377, "text": "62", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 432, "type": "TEXT", "layer": "Point_ID", "x": 1167.283, "y": 1247.101, "text": "61", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 433, "type": "TEXT", "layer": "Point_ID", "x": 1159.479, "y": 1253.586, "text": "60", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 434, "type": "TEXT", "layer": "Point_ID", "x": 1153.608, "y": 1257.502, "text": "59", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 435, "type": "TEXT", "layer": "Point_ID", "x": 1146.7, "y": 1241.294, "text": "58", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 436, "type": "TEXT", "layer": "Point_ID", "x": 1146.186, "y": 1240.367, "text": "57", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 437, "type": "TEXT", "layer": "Point_ID", "x": 1147.056, "y": 1239.782, "text": "56", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 438, "type": "TEXT", "layer": "Point_ID", "x": 1151.387, "y": 1236.715, "text": "55", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 439, "type": "TEXT", "layer": "Point_ID", "x": 1152.277, "y": 1236.1, "text": "54", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 440, "type": "TEXT", "layer": "Point_ID", "x": 1152.804, "y": 1236.857, "text": "53", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 441, "type": "TEXT", "layer": "Point_ID", "x": 1161.696, "y": 1231.108, "text": "52", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 442, "type": "TEXT", "layer": "Point_ID", "x": 1172.727, "y": 1224.214, "text": "51", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 443, "type": "TEXT", "layer": "Point_ID", "x": 1165.041, "y": 1212.209, "text": "50", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 444, "type": "TEXT", "layer": "Point_ID", "x": 1147.141, "y": 1223.678, "text": "49", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 445, "type": "TEXT", "layer": "Point_ID", "x": 1135.863, "y": 1213.886, "text": "48", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 446, "type": "TEXT", "layer": "Point_ID", "x": 1135.315, "y": 1213.014, "text": "47", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 447, "type": "TEXT", "layer": "Point_ID", "x": 1136.264, "y": 1212.546, "text": "46", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 448, "type": "TEXT", "layer": "Point_ID", "x": 1124.466, "y": 1196.459, "text": "45", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 449, "type": "TEXT", "layer": "Point_ID", "x": 1125.141, "y": 1195.762, "text": "44", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 450, "type": "TEXT", "layer": "Point_ID", "x": 1124.743, "y": 1195.151, "text": "43", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 451, "type": "TEXT", "layer": "Point_ID", "x": 1129.061, "y": 1219.035, "text": "42", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 452, "type": "TEXT", "layer": "Point_ID", "x": 1139.386, "y": 1235.265, "text": "41", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 453, "type": "TEXT", "layer": "Point_ID", "x": 1136.092, "y": 1230.113, "text": "40", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 454, "type": "TEXT", "layer": "Point_ID", "x": 1157.991, "y": 1200.014, "text": "39", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 455, "type": "TEXT", "layer": "Point_ID", "x": 1140.942, "y": 1210.829, "text": "38", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 456, "type": "TEXT", "layer": "Point_ID", "x": 1137.119, "y": 1213.304, "text": "37", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 457, "type": "TEXT", "layer": "Point_ID", "x": 1128.727, "y": 1218.728, "text": "36", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 458, "type": "TEXT", "layer": "Point_ID", "x": 1124.333, "y": 1221.436, "text": "35", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 459, "type": "TEXT", "layer": "Point_ID", "x": 1122.373, "y": 1220.971, "text": "34", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 460, "type": "TEXT", "layer": "Point_ID", "x": 1113.269, "y": 1161.274, "text": "33", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 461, "type": "TEXT", "layer": "Point_ID", "x": 1108.619, "y": 1164.588, "text": "32", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 462, "type": "TEXT", "layer": "Point_ID", "x": 1096.082, "y": 1180.931, "text": "31", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 463, "type": "TEXT", "layer": "Point_ID", "x": 1107.198, "y": 1173.468, "text": "30", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 464, "type": "TEXT", "layer": "Point_ID", "x": 1100.024, "y": 1162.659, "text": "29", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 465, "type": "TEXT", "layer": "Point_ID", "x": 1086.169, "y": 1171.656, "text": "28", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 466, "type": "TEXT", "layer": "Point_ID", "x": 1069.576, "y": 1146.736, "text": "27", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 467, "type": "TEXT", "layer": "Point_ID", "x": 1066.371, "y": 1146.594, "text": "26", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 468, "type": "TEXT", "layer": "Point_ID", "x": 1066.173, "y": 1148.482, "text": "25", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 469, "type": "TEXT", "layer": "Point_ID", "x": 1061.624, "y": 1141.927, "text": "24", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 470, "type": "TEXT", "layer": "Point_ID", "x": 1063.4, "y": 1141.797, "text": "23", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 471, "type": "TEXT", "layer": "Point_ID", "x": 1070.184, "y": 1137.356, "text": "22", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 472, "type": "TEXT", "layer": "Point_ID", "x": 1056.765, "y": 1128.985, "text": "21", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 473, "type": "TEXT", "layer": "Point_ID", "x": 1055.422, "y": 1125.136, "text": "20", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 474, "type": "TEXT", "layer": "Point_ID", "x": 1058.039, "y": 1123.443, "text": "19", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 475, "type": "TEXT", "layer": "Point_ID", "x": 1063.965, "y": 1132.676, "text": "18", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 476, "type": "TEXT", "layer": "Point_ID", "x": 1060.624, "y": 1134.9, "text": "17", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 477, "type": "TEXT", "layer": "Point_ID", "x": 1048.755, "y": 1141.737, "text": "16", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 478, "type": "TEXT", "layer": "Point_ID", "x": 1048.856, "y": 1142.75, "text": "15", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 479, "type": "TEXT", "layer": "Point_ID", "x": 1050.223, "y": 1144.767, "text": "14", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 480, "type": "TEXT", "layer": "Point_ID", "x": 1050.156, "y": 1143.876, "text": "13", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 481, "type": "TEXT", "layer": "Point_ID", "x": 1050.813, "y": 1148.606, "text": "12", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 482, "type": "TEXT", "layer": "Point_ID", "x": 1034.95, "y": 1123.974, "text": "11", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 483, "type": "TEXT", "layer": "Point_ID", "x": 1045.492, "y": 1116.626, "text": "10", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 484, "type": "TEXT", "layer": "Point_ID", "x": 963.031, "y": 1103.533, "text": "9", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 485, "type": "TEXT", "layer": "Point_ID", "x": 911.239, "y": 1138.804, "text": "8", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 486, "type": "TEXT", "layer": "Point_ID", "x": 917.309, "y": 1132.12, "text": "7", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 487, "type": "TEXT", "layer": "Point_ID", "x": 923.296, "y": 1126.106, "text": "6", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 488, "type": "TEXT", "layer": "Point_ID", "x": 1000.935, "y": 1071.151, "text": "5", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 489, "type": "TEXT", "layer": "Point_ID", "x": 1003.758, "y": 1076.583, "text": "4", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 490, "type": "TEXT", "layer": "Point_ID", "x": 1005.931, "y": 1079.737, "text": "3", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 491, "type": "TEXT", "layer": "Point_ID", "x": 1011.449, "y": 1087.9, "text": "2", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 492, "type": "TEXT", "layer": "Point_ID", "x": 1022.66, "y": 1081.172, "text": "1", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 493, "type": "TEXT", "layer": "Point_ID", "x": 1108.768, "y": 1096.244, "text": "TANK", "h": 5, "color": "#80deea", "lw": 0.4, "selected": false}, {"id": 494, "type": "TEXT", "layer": "Height", "x": 1153.828, "y": 1276.209, "text": "16.458", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 495, "type": "TEXT", "layer": "Height", "x": 1154.575, "y": 1277.16, "text": "16.467", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 496, "type": "TEXT", "layer": "Height", "x": 1159.252, "y": 1276.619, "text": "16.497", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 497, "type": "TEXT", "layer": "Height", "x": 1159.068, "y": 1274.717, "text": "16.542", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 498, "type": "TEXT", "layer": "Height", "x": 1153.901, "y": 1274.866, "text": "16.456", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 499, "type": "TEXT", "layer": "Height", "x": 1149.285, "y": 1267.399, "text": "16.321", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 500, "type": "TEXT", "layer": "Height", "x": 1142.017, "y": 1270.045, "text": "16.216", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 501, "type": "TEXT", "layer": "Height", "x": 1149.024, "y": 1261.713, "text": "16.521", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 502, "type": "TEXT", "layer": "Height", "x": 1138.92, "y": 1265.763, "text": "16.244", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 503, "type": "TEXT", "layer": "Height", "x": 1138.269, "y": 1264.828, "text": "16.232", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 504, "type": "TEXT", "layer": "Height", "x": 1143.169, "y": 1253.288, "text": "16.535", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 505, "type": "TEXT", "layer": "Height", "x": 1133.356, "y": 1257.298, "text": "16.249", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 506, "type": "TEXT", "layer": "Height", "x": 1132.702, "y": 1256.28, "text": "16.288", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 507, "type": "TEXT", "layer": "Height", "x": 1128.111, "y": 1248.663, "text": "16.347", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 508, "type": "TEXT", "layer": "Height", "x": 1136.435, "y": 1242.194, "text": "16.458", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 509, "type": "TEXT", "layer": "Height", "x": 1101.765, "y": 1319.37, "text": "15.645", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 510, "type": "TEXT", "layer": "Height", "x": 1098.882, "y": 1317.383, "text": "15.624", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 511, "type": "TEXT", "layer": "Height", "x": 1103.007, "y": 1315.825, "text": "15.654", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 512, "type": "TEXT", "layer": "Height", "x": 1070.158, "y": 1271.842, "text": "16.107", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 513, "type": "TEXT", "layer": "Height", "x": 1094.11, "y": 1251.32, "text": "16.378", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 514, "type": "TEXT", "layer": "Height", "x": 1116.86, "y": 1225.448, "text": "16.550", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 515, "type": "TEXT", "layer": "Height", "x": 1112.289, "y": 1219.829, "text": "16.587", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 516, "type": "TEXT", "layer": "Height", "x": 1110.597, "y": 1221.384, "text": "16.519", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 517, "type": "TEXT", "layer": "Height", "x": 1104.476, "y": 1203.536, "text": "16.711", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 518, "type": "TEXT", "layer": "Height", "x": 1099.829, "y": 1198.986, "text": "16.721", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 519, "type": "TEXT", "layer": "Height", "x": 1097.463, "y": 1201.645, "text": "16.721", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 520, "type": "TEXT", "layer": "Height", "x": 1092.259, "y": 1184.791, "text": "16.928", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 521, "type": "TEXT", "layer": "Height", "x": 1086.351, "y": 1185.303, "text": "16.896", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 522, "type": "TEXT", "layer": "Height", "x": 1082.75, "y": 1179.77, "text": "16.922", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 523, "type": "TEXT", "layer": "Height", "x": 1039.161, "y": 1165.581, "text": "17.068", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 524, "type": "TEXT", "layer": "Height", "x": 1020.912, "y": 1182.441, "text": "16.956", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 525, "type": "TEXT", "layer": "Height", "x": 1017.595, "y": 1133.251, "text": "17.079", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 526, "type": "TEXT", "layer": "Height", "x": 1013.4, "y": 1124.891, "text": "17.021", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 527, "type": "TEXT", "layer": "Height", "x": 993.484, "y": 1139.294, "text": "16.890", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 528, "type": "TEXT", "layer": "Height", "x": 997.325, "y": 1142.786, "text": "16.813", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 529, "type": "TEXT", "layer": "Height", "x": 981.845, "y": 1147.289, "text": "16.957", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 530, "type": "TEXT", "layer": "Height", "x": 986.931, "y": 1145.982, "text": "17.059", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 531, "type": "TEXT", "layer": "Height", "x": 990.794, "y": 1152.591, "text": "16.971", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 532, "type": "TEXT", "layer": "Height", "x": 938.774, "y": 1176.446, "text": "16.777", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 533, "type": "TEXT", "layer": "Height", "x": 947.337, "y": 1179.997, "text": "16.718", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 534, "type": "TEXT", "layer": "Height", "x": 1008.345, "y": 1265.959, "text": "16.123", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 535, "type": "TEXT", "layer": "Height", "x": 1011.966, "y": 1285.653, "text": "15.512", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 536, "type": "TEXT", "layer": "Height", "x": 1003.788, "y": 1297.412, "text": "15.207", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 537, "type": "TEXT", "layer": "Height", "x": 1012.644, "y": 1315.128, "text": "15.175", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 538, "type": "TEXT", "layer": "Height", "x": 1035.507, "y": 1313.199, "text": "15.262", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 539, "type": "TEXT", "layer": "Height", "x": 1046.668, "y": 1322.07, "text": "15.196", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 540, "type": "TEXT", "layer": "Height", "x": 1075.872, "y": 1374.201, "text": "14.839", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 541, "type": "TEXT", "layer": "Height", "x": 1102.123, "y": 1413.897, "text": "15.331", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 542, "type": "TEXT", "layer": "Height", "x": 1160.886, "y": 1375.144, "text": "16.096", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 543, "type": "TEXT", "layer": "Height", "x": 1168.56, "y": 1370.104, "text": "16.194", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 544, "type": "TEXT", "layer": "Height", "x": 1200.348, "y": 1349.054, "text": "16.787", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 545, "type": "TEXT", "layer": "Height", "x": 1199.646, "y": 1340.588, "text": "16.500", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 546, "type": "TEXT", "layer": "Height", "x": 1193.825, "y": 1327.893, "text": "16.333", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 547, "type": "TEXT", "layer": "Height", "x": 1197.873, "y": 1334.938, "text": "18.243", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 548, "type": "TEXT", "layer": "Height", "x": 1222.877, "y": 1322.654, "text": "16.466", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 549, "type": "TEXT", "layer": "Height", "x": 1220.896, "y": 1317.734, "text": "15.620", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 550, "type": "TEXT", "layer": "Height", "x": 1213.504, "y": 1313.697, "text": "16.351", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 551, "type": "TEXT", "layer": "Height", "x": 1206.277, "y": 1318.366, "text": "16.588", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 552, "type": "TEXT", "layer": "Height", "x": 1191.793, "y": 1312.585, "text": "16.497", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 553, "type": "TEXT", "layer": "Height", "x": 1203.246, "y": 1307.618, "text": "16.386", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 554, "type": "TEXT", "layer": "Height", "x": 1197.569, "y": 1304.136, "text": "16.484", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 555, "type": "TEXT", "layer": "Height", "x": 1205.623, "y": 1304.368, "text": "16.959", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 556, "type": "TEXT", "layer": "Height", "x": 1200.018, "y": 1298.753, "text": "16.365", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 557, "type": "TEXT", "layer": "Height", "x": 1200.044, "y": 1300.697, "text": "17.989", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 558, "type": "TEXT", "layer": "Height", "x": 1210.93, "y": 1292.261, "text": "17.216", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 559, "type": "TEXT", "layer": "Height", "x": 1223.826, "y": 1288.739, "text": "17.171", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 560, "type": "TEXT", "layer": "Height", "x": 1230.512, "y": 1284.097, "text": "16.708", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 561, "type": "TEXT", "layer": "Height", "x": 1223.379, "y": 1283.496, "text": "17.162", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 562, "type": "TEXT", "layer": "Height", "x": 1195.102, "y": 1260.352, "text": "16.607", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 563, "type": "TEXT", "layer": "Height", "x": 1196.101, "y": 1258.304, "text": "16.536", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 564, "type": "TEXT", "layer": "Height", "x": 1191.17, "y": 1255.333, "text": "16.547", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 565, "type": "TEXT", "layer": "Height", "x": 1193.198, "y": 1254.009, "text": "16.562", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 566, "type": "TEXT", "layer": "Height", "x": 1195.822, "y": 1249.02, "text": "16.551", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 567, "type": "TEXT", "layer": "Height", "x": 1189.829, "y": 1250.996, "text": "16.543", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 568, "type": "TEXT", "layer": "Height", "x": 1190.8, "y": 1252.822, "text": "16.609", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 569, "type": "TEXT", "layer": "Height", "x": 1197.297, "y": 1250.302, "text": "16.553", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 570, "type": "TEXT", "layer": "Height", "x": 1198.209, "y": 1246.769, "text": "16.785", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 571, "type": "TEXT", "layer": "Height", "x": 1205.121, "y": 1254.513, "text": "16.544", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 572, "type": "TEXT", "layer": "Height", "x": 1203.389, "y": 1251.816, "text": "16.559", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 573, "type": "TEXT", "layer": "Height", "x": 1198.358, "y": 1252.217, "text": "16.536", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 574, "type": "TEXT", "layer": "Height", "x": 1198.536, "y": 1255.168, "text": "16.537", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 575, "type": "TEXT", "layer": "Height", "x": 1205.122, "y": 1243.392, "text": "17.720", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 576, "type": "TEXT", "layer": "Height", "x": 1203.163, "y": 1257.76, "text": "16.763", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 577, "type": "TEXT", "layer": "Height", "x": 1209.364, "y": 1259.891, "text": "16.529", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 578, "type": "TEXT", "layer": "Height", "x": 1214.296, "y": 1267.389, "text": "16.617", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 579, "type": "TEXT", "layer": "Height", "x": 1200.309, "y": 1277.111, "text": "16.537", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 580, "type": "TEXT", "layer": "Height", "x": 1202.667, "y": 1273.051, "text": "16.714", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 581, "type": "TEXT", "layer": "Height", "x": 1202.7, "y": 1280.547, "text": "16.467", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 582, "type": "TEXT", "layer": "Height", "x": 1190.878, "y": 1281.863, "text": "17.011", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 583, "type": "TEXT", "layer": "Height", "x": 1195.322, "y": 1285.143, "text": "16.489", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 584, "type": "TEXT", "layer": "Height", "x": 1186.199, "y": 1279.685, "text": "16.526", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 585, "type": "TEXT", "layer": "Height", "x": 1177.327, "y": 1286.042, "text": "16.524", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 586, "type": "TEXT", "layer": "Height", "x": 1183.625, "y": 1296.452, "text": "16.542", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 587, "type": "TEXT", "layer": "Height", "x": 1181.941, "y": 1312.113, "text": "16.533", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 588, "type": "TEXT", "layer": "Height", "x": 1180.455, "y": 1309.905, "text": "16.558", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 589, "type": "TEXT", "layer": "Height", "x": 1177.221, "y": 1304.8, "text": "16.478", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 590, "type": "TEXT", "layer": "Height", "x": 1193.387, "y": 1256.773, "text": "16.685", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 591, "type": "TEXT", "layer": "Height", "x": 1186.502, "y": 1255.842, "text": "16.602", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 592, "type": "TEXT", "layer": "Height", "x": 1182.15, "y": 1257.062, "text": "16.531", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 593, "type": "TEXT", "layer": "Height", "x": 1180.782, "y": 1259.27, "text": "16.650", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 594, "type": "TEXT", "layer": "Height", "x": 1178.327, "y": 1263.215, "text": "16.825", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 595, "type": "TEXT", "layer": "Height", "x": 1180.505, "y": 1266.179, "text": "16.023", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 596, "type": "TEXT", "layer": "Height", "x": 1178.584, "y": 1267.291, "text": "16.595", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 597, "type": "TEXT", "layer": "Height", "x": 1170.115, "y": 1272.762, "text": "16.417", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 598, "type": "TEXT", "layer": "Height", "x": 1161.558, "y": 1279.097, "text": "16.516", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 599, "type": "TEXT", "layer": "Height", "x": 1161.608, "y": 1272.14, "text": "16.525", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 600, "type": "TEXT", "layer": "Height", "x": 1161.345, "y": 1264.709, "text": "16.565", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 601, "type": "TEXT", "layer": "Height", "x": 1165.676, "y": 1257.772, "text": "16.551", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 602, "type": "TEXT", "layer": "Height", "x": 1164.872, "y": 1256.42, "text": "16.553", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 603, "type": "TEXT", "layer": "Height", "x": 1170.852, "y": 1252.056, "text": "16.546", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 604, "type": "TEXT", "layer": "Height", "x": 1170.028, "y": 1253.654, "text": "16.542", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 605, "type": "TEXT", "layer": "Height", "x": 1172.504, "y": 1256.834, "text": "16.529", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 606, "type": "TEXT", "layer": "Height", "x": 1175.827, "y": 1255.325, "text": "16.538", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 607, "type": "TEXT", "layer": "Height", "x": 1181.058, "y": 1251.949, "text": "16.556", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 608, "type": "TEXT", "layer": "Height", "x": 1180.787, "y": 1253.83, "text": "16.569", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 609, "type": "TEXT", "layer": "Height", "x": 1181.833, "y": 1248.607, "text": "16.569", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 610, "type": "TEXT", "layer": "Height", "x": 1167.234, "y": 1238.908, "text": "16.598", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 611, "type": "TEXT", "layer": "Height", "x": 1174.15, "y": 1247.733, "text": "16.592", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 612, "type": "TEXT", "layer": "Height", "x": 1162.283, "y": 1248.601, "text": "16.570", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 613, "type": "TEXT", "layer": "Height", "x": 1154.646, "y": 1255.086, "text": "16.519", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 614, "type": "TEXT", "layer": "Height", "x": 1154.238, "y": 1258.115, "text": "16.490", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 615, "type": "TEXT", "layer": "Height", "x": 1145.303, "y": 1242.794, "text": "16.546", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 616, "type": "TEXT", "layer": "Height", "x": 1141.712, "y": 1240.517, "text": "16.531", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 617, "type": "TEXT", "layer": "Height", "x": 1145.946, "y": 1240.272, "text": "16.532", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 618, "type": "TEXT", "layer": "Height", "x": 1146.387, "y": 1238.215, "text": "16.530", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 619, "type": "TEXT", "layer": "Height", "x": 1148.495, "y": 1236.174, "text": "16.529", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 620, "type": "TEXT", "layer": "Height", "x": 1151.688, "y": 1238.045, "text": "16.550", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 621, "type": "TEXT", "layer": "Height", "x": 1156.529, "y": 1232.608, "text": "16.376", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 622, "type": "TEXT", "layer": "Height", "x": 1167.56, "y": 1225.714, "text": "16.572", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 623, "type": "TEXT", "layer": "Height", "x": 1159.874, "y": 1213.709, "text": "16.472", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 624, "type": "TEXT", "layer": "Height", "x": 1144.571, "y": 1221.793, "text": "16.375", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 625, "type": "TEXT", "layer": "Height", "x": 1130.276, "y": 1214.967, "text": "16.663", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 626, "type": "TEXT", "layer": "Height", "x": 1130.017, "y": 1213.865, "text": "16.649", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 627, "type": "TEXT", "layer": "Height", "x": 1131.419, "y": 1212.631, "text": "16.653", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 628, "type": "TEXT", "layer": "Height", "x": 1118.948, "y": 1197.811, "text": "16.694", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 629, "type": "TEXT", "layer": "Height", "x": 1124.904, "y": 1197.439, "text": "16.701", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 630, "type": "TEXT", "layer": "Height", "x": 1120.484, "y": 1195.196, "text": "16.726", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 631, "type": "TEXT", "layer": "Height", "x": 1129.466, "y": 1219.831, "text": "16.489", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 632, "type": "TEXT", "layer": "Height", "x": 1134.386, "y": 1236.765, "text": "16.380", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 633, "type": "TEXT", "layer": "Height", "x": 1130.925, "y": 1231.613, "text": "16.363", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 634, "type": "TEXT", "layer": "Height", "x": 1152.827, "y": 1200.669, "text": "17.012", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 635, "type": "TEXT", "layer": "Height", "x": 1136.006, "y": 1211.453, "text": "16.617", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 636, "type": "TEXT", "layer": "Height", "x": 1135.759, "y": 1214.975, "text": "16.618", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 637, "type": "TEXT", "layer": "Height", "x": 1123.757, "y": 1219.072, "text": "16.860", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 638, "type": "TEXT", "layer": "Height", "x": 1124.597, "y": 1223.218, "text": "16.957", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 639, "type": "TEXT", "layer": "Height", "x": 1119.012, "y": 1223.776, "text": "16.915", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 640, "type": "TEXT", "layer": "Height", "x": 1108.269, "y": 1162.774, "text": "17.650", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 641, "type": "TEXT", "layer": "Height", "x": 1103.452, "y": 1166.088, "text": "17.649", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 642, "type": "TEXT", "layer": "Height", "x": 1096.772, "y": 1181.909, "text": "17.157", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 643, "type": "TEXT", "layer": "Height", "x": 1101.443, "y": 1174.124, "text": "17.282", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 644, "type": "TEXT", "layer": "Height", "x": 1094.857, "y": 1163.04, "text": "17.439", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 645, "type": "TEXT", "layer": "Height", "x": 1081.336, "y": 1173.156, "text": "17.122", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 646, "type": "TEXT", "layer": "Height", "x": 1069.948, "y": 1146.982, "text": "17.598", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 647, "type": "TEXT", "layer": "Height", "x": 1061.204, "y": 1148.094, "text": "17.759", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 648, "type": "TEXT", "layer": "Height", "x": 1061.006, "y": 1149.982, "text": "17.573", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 649, "type": "TEXT", "layer": "Height", "x": 1055.854, "y": 1142.541, "text": "17.774", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 650, "type": "TEXT", "layer": "Height", "x": 1058.536, "y": 1140.797, "text": "17.742", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 651, "type": "TEXT", "layer": "Height", "x": 1070.618, "y": 1137.804, "text": "17.294", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 652, "type": "TEXT", "layer": "Height", "x": 1051.932, "y": 1130.485, "text": "17.122", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 653, "type": "TEXT", "layer": "Height", "x": 1050.422, "y": 1126.636, "text": "17.027", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 654, "type": "TEXT", "layer": "Height", "x": 1056.887, "y": 1123.281, "text": "17.082", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 655, "type": "TEXT", "layer": "Height", "x": 1064.091, "y": 1133.679, "text": "17.115", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 656, "type": "TEXT", "layer": "Height", "x": 1055.791, "y": 1136.4, "text": "17.122", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 657, "type": "TEXT", "layer": "Height", "x": 1046.541, "y": 1141.513, "text": "17.026", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 658, "type": "TEXT", "layer": "Height", "x": 1049.48, "y": 1146.354, "text": "17.072", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 659, "type": "TEXT", "layer": "Height", "x": 1049.93, "y": 1143.686, "text": "17.062", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 660, "type": "TEXT", "layer": "Height", "x": 1045.646, "y": 1150.106, "text": "17.287", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 661, "type": "TEXT", "layer": "Height", "x": 1029.371, "y": 1123.745, "text": "17.246", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 662, "type": "TEXT", "layer": "Height", "x": 1045.429, "y": 1118.387, "text": "17.063", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 663, "type": "TEXT", "layer": "Height", "x": 961.607, "y": 1105.378, "text": "16.841", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 664, "type": "TEXT", "layer": "Height", "x": 906.406, "y": 1140.304, "text": "16.717", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 665, "type": "TEXT", "layer": "Height", "x": 916.548, "y": 1134.109, "text": "16.732", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 666, "type": "TEXT", "layer": "Height", "x": 922.822, "y": 1127.822, "text": "16.778", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 667, "type": "TEXT", "layer": "Height", "x": 999.656, "y": 1072.936, "text": "17.415", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 668, "type": "TEXT", "layer": "Height", "x": 997.977, "y": 1077.256, "text": "17.409", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 669, "type": "TEXT", "layer": "Height", "x": 1004.233, "y": 1079.565, "text": "17.319", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 670, "type": "TEXT", "layer": "Height", "x": 1006.282, "y": 1089.4, "text": "16.933", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 671, "type": "TEXT", "layer": "Height", "x": 1018.162, "y": 1081.327, "text": "17.179", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 672, "type": "TEXT", "layer": "Height", "x": 1103.268, "y": 1097.744, "text": "23.469", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 673, "type": "TEXT", "layer": "Height", "x": 1103.268, "y": 1097.744, "text": "23.469", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 674, "type": "TEXT", "layer": "Height", "x": 1025.803, "y": 1227.64, "text": "16.531", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 675, "type": "TEXT", "layer": "Height", "x": 985.095, "y": 1192.143, "text": "16.741", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 676, "type": "TEXT", "layer": "Height", "x": 1124.977, "y": 1348.161, "text": "15.645", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 677, "type": "TEXT", "layer": "Height", "x": 1157.068, "y": 1329.759, "text": "16.089", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}, {"id": 678, "type": "TEXT", "layer": "Height", "x": 971.623, "y": 1125.559, "text": "16.899", "h": 4, "color": "#9e9e9e", "lw": 0.4, "selected": false}];
+
+let nextId = ENTITIES.length + 1;
+
+// ── SETTINGS ──
+let showGrid = true, snapOn = true, orthoOn = true;
+let polarOn = true, dynaOn = true, lLigOn = false;
+
+// Measurement state
+let measurements = []; // [{type:'dist'|'length'|'angle'|'area', p1, p2, p3?, value, label}]
+let measureMode = null; // 'dist' | 'length' | 'angle' | 'area'
+
+// File state
+let currentFilename = null;  // null = untitled
+let currentFileFormat = 'json';  // 'json' | 'dxf' | 'dwg'
+let isModified = false;
+let currentLayer = '0';
+let currentTool = 'select';
+let currentTab = 'home';
+let currentPanel = 'props';
+
+// ── VIEWPORT TRANSFORM ──
+let vpScale = 1, vpX = 0, vpY = 0;
+
+// ── CANVAS ──
+const cadCanvas = document.getElementById('cad');
+const gridCanvas = document.getElementById('grid');
+const ctx = cadCanvas.getContext('2d');
+const gctx = gridCanvas.getContext('2d');
+
+function resizeCanvases() {
+  const wrap = document.getElementById('canvas-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  cadCanvas.width = gridCanvas.width = W;
+  cadCanvas.height = gridCanvas.height = H;
+  drawGrid(); redraw();
+}
+
+// ── COORDINATE TRANSFORMS ──
+function svgToScreen(sx, sy) {
+  return [sx * vpScale + vpX, sy * vpScale + vpY];
+}
+function screenToSvg(cx, cy) {
+  return [(cx - vpX) / vpScale, (cy - vpY) / vpScale];
+}
+function svgToWorld(sx, sy) {
+  return [XMIN + sx, YMIN + (DY - sy)];
+}
+
+// ── GRID ──
+function drawGrid() {
+  const W = gridCanvas.width, H = gridCanvas.height;
+  gctx.clearRect(0, 0, W, H);
+  if (!showGrid) return;
+  // grid step in world meters
+  const steps = [1,2,5,10,20,50,100,200,500,1000];
+  const targetPx = 50;
+  const worldPerPx = 1 / vpScale;
+  const worldStep = worldPerPx * targetPx;
+  let step = steps[0];
+  for (const s of steps) { if (s >= worldStep) { step = s; break; } }
+  const px = step * vpScale;
+  // minor
+  gctx.strokeStyle = 'rgba(30,41,59,0.8)';
+  gctx.lineWidth = 0.5;
+  gctx.beginPath();
+  const x0 = ((0 - vpX) / vpScale); const y0 = ((0 - vpY) / vpScale);
+  const startX = Math.floor(x0 / step) * step;
+  const startY = Math.floor(y0 / step) * step;
+  for (let x = startX; x < x0 + W/vpScale + step; x += step) {
+    const sx = x * vpScale + vpX;
+    gctx.moveTo(sx, 0); gctx.lineTo(sx, H);
+  }
+  for (let y = startY; y < y0 + H/vpScale + step; y += step) {
+    const sy = y * vpScale + vpY;
+    gctx.moveTo(0, sy); gctx.lineTo(W, sy);
+  }
+  gctx.stroke();
+}
+
+// ── DRAW ENTITY ──
+function drawEntity(e, highlight) {
+  const sel = e.selected;
+  const col = sel ? '#facc15' : (highlight ? '#93c5fd' : e.color);
+  const lw = Math.max(0.5, e.lw * vpScale * 0.5);
+  ctx.strokeStyle = col;
+  ctx.fillStyle = col;
+  ctx.lineWidth = lw;
+  ctx.setLineDash([]);
+
+  if (e.type === 'LWPOLYLINE') {
+    if (!e.pts || e.pts.length < 2) return;
+    ctx.beginPath();
+    const [sx0, sy0] = svgToScreen(e.pts[0][0], e.pts[0][1]);
+    ctx.moveTo(sx0, sy0);
+    for (let i = 1; i < e.pts.length; i++) {
+      const [sx, sy] = svgToScreen(e.pts[i][0], e.pts[i][1]);
+      ctx.lineTo(sx, sy);
+    }
+    ctx.stroke();
+    if (sel) {
+      // draw grips
+      for (const p of e.pts) {
+        const [sx, sy] = svgToScreen(p[0], p[1]);
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(sx-3, sy-3, 6, 6);
+      }
+    }
+  }
+  else if (e.type === 'LINE') {
+    ctx.beginPath();
+    const [x1,y1] = svgToScreen(e.x1, e.y1);
+    const [x2,y2] = svgToScreen(e.x2, e.y2);
+    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    if (sel) {
+      ctx.fillStyle='#facc15';
+      ctx.fillRect(x1-3,y1-3,6,6);
+      ctx.fillRect(x2-3,y2-3,6,6);
+    }
+  }
+  else if (e.type === 'CIRCLE') {
+    const [sx,sy] = svgToScreen(e.cx, e.cy);
+    const sr = e.r * vpScale;
+    ctx.beginPath(); ctx.arc(sx,sy,Math.max(sr,1),0,Math.PI*2); ctx.stroke();
+    if (sel) {
+      ctx.fillStyle='#facc15';
+      ctx.fillRect(sx-3,sy-3,6,6);
+    }
+  }
+  else if (e.type === 'ARC') {
+    const [sx,sy] = svgToScreen(e.cx, e.cy);
+    const sr = e.r * vpScale;
+    // In SVG coords Y is flipped so angles are negated
+    ctx.beginPath();
+    ctx.arc(sx,sy,Math.max(sr,1), -e.endA, -e.startA, false);
+    ctx.stroke();
+  }
+  else if (e.type === 'RECT') {
+    const [x1,y1] = svgToScreen(e.x1, e.y1);
+    const [x2,y2] = svgToScreen(e.x2, e.y2);
+    ctx.strokeRect(x1, y1, x2-x1, y2-y1);
+    if (sel) {
+      ctx.fillStyle='#facc15';
+      [[x1,y1],[x2,y1],[x1,y2],[x2,y2]].forEach(([px,py])=>ctx.fillRect(px-3,py-3,6,6));
+    }
+  }
+  else if (e.type === 'POINT') {
+    const [sx,sy] = svgToScreen(e.x, e.y);
+    const s = Math.max(2, 3*vpScale*0.3);
+    ctx.strokeStyle = sel ? '#facc15' : '#ff00ff';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(sx-s,sy); ctx.lineTo(sx+s,sy);
+    ctx.moveTo(sx,sy-s); ctx.lineTo(sx,sy+s);
+    ctx.stroke();
+  }
+  else if (e.type === 'TEXT') {
+    const [sx,sy] = svgToScreen(e.x, e.y);
+    const fs = Math.max(5, e.h * vpScale * 0.55);
+    ctx.fillStyle = sel ? '#facc15' : e.color;
+    ctx.font = `${fs}px monospace`;
+    ctx.fillText(e.text || '', sx, sy);
+  }
+  else if (e.type === 'SPLINE' && e.pts && e.pts.length >= 2) {
+    // Catmull-Rom interpolated curve as Bezier
+    ctx.beginPath();
+    const [s0x,s0y] = svgToScreen(e.pts[0][0], e.pts[0][1]);
+    ctx.moveTo(s0x, s0y);
+    for (let i = 0; i < e.pts.length - 1; i++) {
+      const p0 = e.pts[Math.max(0, i - 1)];
+      const p1 = e.pts[i];
+      const p2 = e.pts[i + 1];
+      const p3 = e.pts[Math.min(e.pts.length - 1, i + 2)];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      const [c1x,c1y] = svgToScreen(c1[0], c1[1]);
+      const [c2x,c2y] = svgToScreen(c2[0], c2[1]);
+      const [p2x,p2y] = svgToScreen(p2[0], p2[1]);
+      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, p2x, p2y);
+    }
+    ctx.stroke();
+  }
+  else if (e.type === 'DIM' && e.p1 && e.p2 && e.pos) {
+    const [a1x,a1y] = svgToScreen(e.p1[0], e.p1[1]);
+    const [a2x,a2y] = svgToScreen(e.p2[0], e.p2[1]);
+    const [px,py] = svgToScreen(e.pos[0], e.pos[1]);
+    // Extension lines
+    ctx.beginPath();
+    ctx.moveTo(a1x, a1y); ctx.lineTo(px, py);
+    ctx.moveTo(a2x, a2y); ctx.lineTo(px, py);
+    ctx.stroke();
+    // Dim line + arrows
+    const dx = a2x - a1x, dy = a2y - a1y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    const nx = -uy, ny = ux;
+    const aSize = 8;
+    ctx.beginPath();
+    ctx.moveTo(a1x + nx * aSize - ux * aSize, a1y + ny * aSize - uy * aSize);
+    ctx.lineTo(a1x, a1y);
+    ctx.lineTo(a1x + nx * aSize + ux * aSize, a1y + ny * aSize + uy * aSize);
+    ctx.moveTo(a2x - nx * aSize - ux * aSize, a2y - ny * aSize - uy * aSize);
+    ctx.lineTo(a2x, a2y);
+    ctx.lineTo(a2x - nx * aSize + ux * aSize, a2y - ny * aSize + uy * aSize);
+    ctx.moveTo(a1x, a1y); ctx.lineTo(a2x, a2y);
+    ctx.stroke();
+    const midX = (a1x + a2x) / 2 + nx * 4;
+    const midY = (a1y + a2y) / 2 + ny * 4;
+    const fs = Math.max(9, 10 * Math.min(vpScale, 2));
+    ctx.font = `${fs}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText((e.value || Math.hypot(e.p2[0]-e.p1[0], e.p2[1]-e.p1[1])).toFixed(2), midX, midY);
+    ctx.textAlign = 'start';
+    ctx.textBaseline = 'alphabetic';
+  }
+}
+
+// ── REDRAW ──
+function redraw() {
+  const W = cadCanvas.width, H = cadCanvas.height;
+  ctx.clearRect(0, 0, W, H);
+  // Cursor crosshair
+  if (mouseX !== undefined) {
+    ctx.strokeStyle = 'rgba(96,165,250,0.3)';
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(mouseX, 0); ctx.lineTo(mouseX, H);
+    ctx.moveTo(0, mouseY); ctx.lineTo(W, mouseY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // Draw all entities by layer order
+  const layerOrder = ['SAAD','hatch','0','Edging','Main Road','manhole','BUILDING','Hangar','Point_ID','Height'];
+  const drawn = new Set();
+  for (const layer of [...layerOrder, ...Object.keys(LAYER_DEF)]) {
+    if (!layerVisible[layer] && layerVisible[layer] !== undefined) continue;
+    for (const e of ENTITIES) {
+      if (drawn.has(e.id)) continue;
+      if (e.layer === layer && (layerVisible[e.layer] !== false)) {
+        drawEntity(e, false);
+        drawn.add(e.id);
+      }
+    }
+  }
+  // Draw remaining
+  for (const e of ENTITIES) {
+    if (!drawn.has(e.id) && layerVisible[e.layer] !== false) drawEntity(e, false);
+  }
+  // Draw preview shape
+  drawPreview();
+  // Draw measurements
+  drawMeasurements();
+  // Draw selection box
+  if (selBox) {
+    ctx.strokeStyle = selBox.cross ? 'rgba(96,165,250,0.6)' : 'rgba(34,197,94,0.6)';
+    ctx.fillStyle = selBox.cross ? 'rgba(96,165,250,0.05)' : 'rgba(34,197,94,0.05)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash(selBox.cross ? [4,2] : []);
+    const [x1,y1] = svgToScreen(Math.min(selBox.x1,selBox.x2), Math.min(selBox.y1,selBox.y2));
+    const [x2,y2] = svgToScreen(Math.max(selBox.x1,selBox.x2), Math.max(selBox.y1,selBox.y2));
+    ctx.fillRect(x1,y1,x2-x1,y2-y1);
+    ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+    ctx.setLineDash([]);
+  }
+}
+
+// ── LAYER VISIBILITY ──
+let layerVisible = {};
+for (const k of Object.keys(LAYER_DEF)) layerVisible[k] = true;
+
+// ── MOUSE STATE ──
+let mouseX, mouseY, mouseDown = false, panStart = null;
+let drawPts = [], drawStart = null, drawPreviewPt = null;
+let selBox = null;
+
+// ── HISTORY ──
+let undoStack = [], redoStack2 = [];
+function saveState() {
+  undoStack.push(JSON.stringify(ENTITIES));
+  if (undoStack.length > 50) undoStack.shift();
+  redoStack2 = [];
+  markModified();
+}
+function undo() {
+  if (!undoStack.length) { logCmd('Rien à annuler.'); return; }
+  redoStack2.push(JSON.stringify(ENTITIES));
+  ENTITIES = JSON.parse(undoStack.pop());
+  logCmd('Annulé.');
+  redraw(); updateSelCount();
+}
+function redo() {
+  if (!redoStack2.length) { logCmd('Rien à rétablir.'); return; }
+  undoStack.push(JSON.stringify(ENTITIES));
+  ENTITIES = JSON.parse(redoStack2.pop());
+  logCmd('Rétabli.');
+  redraw(); updateSelCount();
+}
+
+// ── SNAP ──
+function snapPoint(sx, sy) {
+  if (!snapOn) return [sx, sy];
+  let best = null, bestD = 8 / vpScale;
+  for (const e of ENTITIES) {
+    const candidates = [];
+    if (e.type === 'LWPOLYLINE' || e.type === 'LINE') {
+      const pts = e.pts || [[e.x1,e.y1],[e.x2,e.y2]];
+      for (const p of pts) candidates.push(p);
+    }
+    if (e.type === 'CIRCLE') candidates.push([e.cx, e.cy]);
+    if (e.type === 'POINT') candidates.push([e.x, e.y]);
+    for (const [cx,cy] of candidates) {
+      const d = Math.hypot(sx-cx, sy-cy);
+      if (d < bestD) { bestD = d; best = [cx, cy]; }
+    }
+  }
+  return best || [sx, sy];
+}
+
+// ── ORTHO ──
+function orthoSnap(sx, sy, fromX, fromY) {
+  if (!orthoOn || fromX === undefined) return [sx, sy];
+  const dx = sx - fromX, dy = sy - fromY;
+  if (Math.abs(dx) > Math.abs(dy)) return [sx, fromY];
+  return [fromX, sy];
+}
+
+// ── PREVIEW ──
+function drawPreview() {
+  if (!drawPreviewPt || drawPts.length === 0) return;
+  const [px, py] = drawPreviewPt;
+  const from = drawPts[drawPts.length-1];
+  ctx.strokeStyle = 'rgba(250,204,21,0.8)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 3]);
+
+  if (currentTool === 'line' || currentTool === 'pline') {
+    if (drawPts.length >= 1) {
+      ctx.beginPath();
+      const [sx0,sy0] = svgToScreen(from[0], from[1]);
+      const [sx1,sy1] = svgToScreen(px, py);
+      ctx.moveTo(sx0,sy0); ctx.lineTo(sx1,sy1); ctx.stroke();
+    }
+  } else if (currentTool === 'circle') {
+    const [cx,cy] = svgToScreen(from[0], from[1]);
+    const r = Math.hypot(px-from[0], py-from[1]) * vpScale;
+    ctx.beginPath(); ctx.arc(cx,cy,Math.max(r,1),0,Math.PI*2); ctx.stroke();
+  } else if (currentTool === 'rect') {
+    const [x1,y1] = svgToScreen(from[0], from[1]);
+    const [x2,y2] = svgToScreen(px, py);
+    ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+  } else if (currentTool === 'arc' && drawPts.length === 2) {
+    const [cx,cy] = svgToScreen(drawPts[0][0], drawPts[0][1]);
+    const r = Math.hypot(drawPts[1][0]-drawPts[0][0], drawPts[1][1]-drawPts[0][1]) * vpScale;
+    const ang = Math.atan2(py-drawPts[0][1], px-drawPts[0][0]);
+    ctx.beginPath(); ctx.arc(cx,cy,Math.max(r,1),-Math.atan2(drawPts[1][1]-drawPts[0][1], drawPts[1][0]-drawPts[0][0]), -ang); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // draw snapped point indicator
+  const [spx,spy] = svgToScreen(px, py);
+  ctx.strokeStyle='rgba(250,204,21,0.9)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(spx,spy,4,0,Math.PI*2); ctx.stroke();
+  // draw previous points
+  ctx.fillStyle='#facc15';
+  for (const p of drawPts) {
+    const [sx,sy] = svgToScreen(p[0],p[1]);
+    ctx.fillRect(sx-2,sy-2,4,4);
+  }
+}
+
+// ── TOOL SET ──
+const TOOL_BTN = {
+  select:'tsel', line:'tline', pline:'tpline', spline:'tspline', circle:'tcircle',
+  arc:'tarc', rect:'trect', text:'ttext', point:'tpoint', dim:'tdim',
+  move:'tmove', copy:'tcopy', rotate:'trotate', scale:'tscale', mirror:'tmirror',
+  offset:'toffset', trim:'ttrim', extend:'textend', pan:'tpan', zoom:'tzoom',
+  measure:'tmeasure', measureLen:'tmeasure', measureAngle:'tmeasure', measureArea:'tmeasure',
+};
+function setTool(t) {
+  currentTool = t;
+  drawPts = []; drawPreviewPt = null; selBox = null;
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  const btn = document.getElementById(TOOL_BTN[t] || ('t'+t));
+  if (btn) btn.classList.add('active');
+  const cursors = { select:'default', pan:'grab', zoom:'zoom-in',
+    line:'crosshair', pline:'crosshair', circle:'crosshair', arc:'crosshair',
+    rect:'crosshair', text:'text', move:'move', copy:'copy', rotate:'crosshair',
+    scale:'crosshair', mirror:'crosshair', offset:'crosshair',
+    trim:'crosshair', extend:'crosshair', dim:'crosshair', spline:'crosshair',
+    point:'crosshair', measure:'crosshair', measureLen:'crosshair', measureAngle:'crosshair', measureArea:'crosshair' };
+  cadCanvas.style.cursor = cursors[t] || 'crosshair';
+  const msgs = {
+    select:'Cliquez pour sélectionner — glissez pour une boîte de sélection',
+    line:'Ligne: cliquez le premier point',
+    pline:'Polyligne: cliquez les points — Entrée ou double-clic pour terminer',
+    spline:'Spline: cliquez les points de contrôle — Entrée pour terminer',
+    circle:'Cercle: cliquez le centre',
+    arc:'Arc: cliquez le centre',
+    rect:'Rectangle: cliquez le premier coin',
+    text:'Texte: cliquez le point d\'insertion',
+    point:'Point: cliquez pour placer un point',
+    dim:'Cote: cliquez 2 points + position de la ligne de cote',
+    move:'Déplacer: sélectionnez d\'abord des objets, puis cliquez la base et la nouvelle position',
+    copy:'Copier: sélectionnez d\'abord, puis cliquez la base et la destination',
+    rotate:'Rotation: sélectionnez, cliquez la base, tapez l\'angle en degrés',
+    scale:'Échelle: sélectionnez, cliquez la base, tapez le facteur',
+    mirror:'Symétrie: sélectionnez, puis 2 points pour l\'axe de symétrie',
+    offset:'Décaler: cliquez un objet, tapez la distance, OK=droite/Annuler=gauche',
+    trim:'Ajuster: cliquez les bords de coupe, puis les objets à ajuster (Échap pour finir)',
+    extend:'Prolonger: cliquez les limites, puis les objets à prolonger (Échap pour finir)',
+    pan:'Panoramique: cliquez-glissez',
+    zoom:'Zoom: clic gauche = zoom+, clic droit = zoom-, molette = zoom',
+    measure:'Mesure: 1er clic = point de départ, 2e clic = point d\'arrivée (distance affichée)',
+    measureLen:'Mesure longueur: cliquez une polyligne/ligne pour mesurer sa longueur totale',
+    measureAngle:'Mesure angle: 3 clics = sommet + 2 côtés',
+    measureArea:'Mesure surface: dessinez un contour fermé (polyligne), Entrée pour finir',
+  };
+  logCmd(msgs[t] || 'Outil: '+t.toUpperCase());
+  redraw();
+}
+
+// ── CANVAS MOUSE ──
+cadCanvas.addEventListener('mousemove', e => {
+  const r = cadCanvas.getBoundingClientRect();
+  mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+  let [sx, sy] = screenToSvg(mouseX, mouseY);
+
+  // Ortho
+  if (drawPts.length > 0) {
+    [sx, sy] = orthoSnap(sx, sy, drawPts[drawPts.length-1][0], drawPts[drawPts.length-1][1]);
+  }
+  // Snap
+  const [snx, sny] = snapPoint(sx, sy);
+  drawPreviewPt = [snx, sny];
+
+  // Pan
+  if (panStart && (e.buttons === 2 || e.buttons === 4 || currentTool === 'pan')) {
+    vpX += mouseX - panStart[0]; vpY += mouseY - panStart[1];
+    panStart = [mouseX, mouseY];
+    drawGrid(); redraw(); return;
+  }
+
+  // Selection box
+  if (selBox && mouseDown) {
+    const [svx, svy] = screenToSvg(mouseX, mouseY);
+    selBox.x2 = svx; selBox.y2 = svy;
+    selBox.cross = svx < selBox.x1;
+    redraw(); return;
+  }
+
+  // Update coords display
+  const [wx, wy] = svgToWorld(snx, sny);
+  document.getElementById('cE').textContent = wx.toFixed(3);
+  document.getElementById('cN').textContent = wy.toFixed(3);
+  if (drawPts.length > 0) {
+    const [wx0, wy0] = svgToWorld(drawPts[drawPts.length-1][0], drawPts[drawPts.length-1][1]);
+    document.getElementById('cDX').textContent = (wx-wx0).toFixed(3);
+    document.getElementById('cDY').textContent = (wy-wy0).toFixed(3);
+    const dist = Math.hypot(wx-wx0, wy-wy0);
+    document.getElementById('cD').textContent = dist.toFixed(3);
+    const ang = (Math.atan2(wy-wy0, wx-wx0)*180/Math.PI).toFixed(1);
+    document.getElementById('cAng').textContent = ang+'°';
+  }
+  redraw();
+});
+
+cadCanvas.addEventListener('mousedown', e => {
+  mouseDown = true;
+  const r = cadCanvas.getBoundingClientRect();
+  const cx = e.clientX - r.left, cy = e.clientY - r.top;
+  let [sx, sy] = screenToSvg(cx, cy);
+
+  if (e.button === 1 || e.button === 2) {
+    panStart = [cx, cy]; return;
+  }
+
+  if (currentTool === 'pan') { panStart = [cx, cy]; return; }
+  if (currentTool === 'zoom') { zoom(e.button===2 ? 0.7 : 1.4, cx, cy); return; }
+
+  if (drawPts.length > 0) {
+    [sx, sy] = orthoSnap(sx, sy, drawPts[drawPts.length-1][0], drawPts[drawPts.length-1][1]);
+  }
+  const [snx, sny] = snapPoint(sx, sy);
+
+  // ── DRAWING TOOLS ──
+  if (currentTool === 'line') {
+    if (drawPts.length === 0) {
+      drawPts = [[snx, sny]];
+      logCmd(`Ligne — Premier point: ${snx.toFixed(2)},${sny.toFixed(2)}`);
+    } else {
+      saveState();
+      ENTITIES.push({ id: nextId++, type:'LINE', layer: currentLayer,
+        x1:drawPts[0][0], y1:drawPts[0][1], x2:snx, y2:sny,
+        color: LAYER_DEF[currentLayer]?.color||'#ccc', lw: LAYER_DEF[currentLayer]?.lw||0.6,
+        pts:[[drawPts[0][0],drawPts[0][1]],[snx,sny]], selected:false });
+      logCmd(`Ligne tracée: (${drawPts[0][0].toFixed(1)},${drawPts[0][1].toFixed(1)}) → (${snx.toFixed(1)},${sny.toFixed(1)})`);
+      drawPts = [[snx, sny]]; // continue line chain
+      redraw(); return;
+    }
+  }
+  else if (currentTool === 'pline') {
+    drawPts.push([snx, sny]);
+    logCmd(`Polyligne: point ${drawPts.length} ajouté — double-clic ou Entrée pour terminer`);
+  }
+  else if (currentTool === 'circle') {
+    if (drawPts.length === 0) {
+      drawPts = [[snx, sny]];
+      logCmd(`Cercle — Centre: ${snx.toFixed(2)},${sny.toFixed(2)} — Cliquez le rayon`);
+    } else {
+      const r = Math.hypot(snx-drawPts[0][0], sny-drawPts[0][1]);
+      saveState();
+      ENTITIES.push({ id:nextId++, type:'CIRCLE', layer:currentLayer,
+        cx:drawPts[0][0], cy:drawPts[0][1], r:r,
+        color:LAYER_DEF[currentLayer]?.color||'#ccc', lw:LAYER_DEF[currentLayer]?.lw||0.6,
+        selected:false });
+      logCmd(`Cercle créé: centre (${drawPts[0][0].toFixed(1)},${drawPts[0][1].toFixed(1)}) r=${r.toFixed(2)}`);
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'arc') {
+    if (drawPts.length < 2) {
+      drawPts.push([snx, sny]);
+      if (drawPts.length===1) logCmd('Arc — Centre défini. Cliquez le point de départ.');
+      else logCmd('Arc — Point de départ défini. Cliquez le point de fin.');
+    } else {
+      const r = Math.hypot(drawPts[1][0]-drawPts[0][0], drawPts[1][1]-drawPts[0][1]);
+      const startA = Math.atan2(drawPts[1][1]-drawPts[0][1], drawPts[1][0]-drawPts[0][0]);
+      const endA = Math.atan2(sny-drawPts[0][1], snx-drawPts[0][0]);
+      saveState();
+      ENTITIES.push({ id:nextId++, type:'ARC', layer:currentLayer,
+        cx:drawPts[0][0], cy:drawPts[0][1], r:r, startA, endA,
+        color:LAYER_DEF[currentLayer]?.color||'#ccc', lw:LAYER_DEF[currentLayer]?.lw||0.6,
+        selected:false });
+      logCmd(`Arc créé: r=${r.toFixed(2)}`);
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'rect') {
+    if (drawPts.length === 0) {
+      drawPts = [[snx, sny]];
+      logCmd(`Rectangle — Premier coin: ${snx.toFixed(2)},${sny.toFixed(2)}`);
+    } else {
+      saveState();
+      const [x1,y1] = drawPts[0], x2=snx, y2=sny;
+      ENTITIES.push({ id:nextId++, type:'RECT', layer:currentLayer,
+        x1, y1, x2, y2, pts:[[x1,y1],[x2,y1],[x2,y2],[x1,y2],[x1,y1]],
+        color:LAYER_DEF[currentLayer]?.color||'#ccc', lw:LAYER_DEF[currentLayer]?.lw||0.6,
+        selected:false });
+      logCmd(`Rectangle créé: (${x1.toFixed(1)},${y1.toFixed(1)}) → (${x2.toFixed(1)},${y2.toFixed(1)}) — ${Math.abs(x2-x1).toFixed(1)}×${Math.abs(y2-y1).toFixed(1)}`);
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'text') {
+    const txt = prompt('Entrez le texte:', '');
+    if (txt) {
+      saveState();
+      ENTITIES.push({ id:nextId++, type:'TEXT', layer:currentLayer,
+        x:snx, y:sny, text:txt, h:10,
+        color:LAYER_DEF[currentLayer]?.color||'#ccc', lw:0.4, selected:false });
+      logCmd(`Texte ajouté: "${txt}" en (${snx.toFixed(1)},${sny.toFixed(1)})`);
+    }
+    drawPts = [];
+  }
+  else if (currentTool === 'measure') {
+    // Distance between two points — use drawPts[0] as the first point, current click as second
+    if (drawPts.length === 0) {
+      drawPts = [[snx, sny]];
+      logCmd('Mesure: 1er point défini — cliquez le 2e point');
+    } else {
+      const p1 = drawPts[0];
+      const p2 = [snx, sny];
+      const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+      const d = Math.hypot(dx, dy);
+      const ang = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(2);
+      measurements.push({type:'dist', p1, p2, dx, dy, dist: d, angle: parseFloat(ang), ts: Date.now()});
+      logCmd('<span style="color:#22c55e">✓ Distance: <b>'+d.toFixed(3)+' m</b> (ΔX='+dx.toFixed(2)+', ΔY='+dy.toFixed(2)+', ∠='+ang+'°)</span>');
+      updateMeasurementsPanel();
+      drawPts = [];
+      drawPreviewPt = null;
+      redraw();
+    }
+  }
+  else if (currentTool === 'measureLen') {
+    // Length of a line/polyline - click the entity
+    const e = pickTopAt(snx, sny);
+    if (e) {
+      let total = 0, segs = [];
+      if (e.type === 'LINE') {
+        total = dist(e.p1 || [e.x1, e.y1], e.p2 || [e.x2, e.y2]);
+        segs = [[e.x1, e.y1, e.x2, e.y2]];
+      } else if (e.type === 'LWPOLYLINE' || e.type === 'POLYLINE' || e.type === 'RECT') {
+        const pts = e.pts || [[e.x1, e.y1],[e.x2, e.y1],[e.x2, e.y2],[e.x1, e.y2]];
+        for (let i = 0; i < pts.length - 1; i++) total += dist(pts[i], pts[i+1]);
+        if (e.closed || e.type === 'RECT') total += dist(pts[pts.length-1], pts[0]);
+        segs = pts;
+      } else if (e.type === 'CIRCLE') {
+        total = 2 * Math.PI * e.r;
+      } else if (e.type === 'ARC') {
+        let a0 = e.startA || 0, a1 = e.endA || Math.PI*2;
+        let sweep = a1 - a0;
+        if (sweep < 0) sweep += Math.PI*2;
+        total = e.r * sweep;
+      }
+      measurements.push({type:'length', entityId: e.id, total, ts: Date.now()});
+      logCmd('<span style="color:#22c55e">✓ Longueur: <b>'+total.toFixed(3)+' m</b> ('+e.type+' #' + e.id + ')</span>');
+      updateMeasurementsPanel();
+      redraw();
+    } else {
+      logCmd('Cliquez sur une entité (ligne, polyligne, cercle, arc)');
+    }
+  }
+  else if (currentTool === 'measureAngle') {
+    if (drawPts.length < 2) {
+      drawPts.push([snx, sny]);
+      logCmd(drawPts.length === 1 ? 'Angle: 1er point (sommet sera le 2e)' : 'Angle: 3e point');
+    } else {
+      // 3 points: drawPts[0], drawPts[1]=vertex, current click = p3
+      const p1 = drawPts[0];
+      const p2 = drawPts[1];
+      const p3 = [snx, sny];
+      const a1 = Math.atan2(p1[1] - p2[1], p1[0] - p2[0]);
+      const a2 = Math.atan2(p3[1] - p2[1], p3[0] - p2[0]);
+      let ang = (a2 - a1) * 180 / Math.PI;
+      while (ang < 0) ang += 360;
+      while (ang > 360) ang -= 360;
+      const angMin = ang > 180 ? 360 - ang : ang;
+      measurements.push({type:'angle', p1, p2, p3, angle: ang, angleMin: angMin, ts: Date.now()});
+      logCmd('<span style="color:#22c55e">✓ Angle: <b>'+ang.toFixed(2)+'°</b> (ou '+angMin.toFixed(2)+'° rentrant)</span>');
+      updateMeasurementsPanel();
+      drawPts = [];
+      drawPreviewPt = null;
+      redraw();
+    }
+  }
+  else if (currentTool === 'measureArea') {
+    if (drawPts.length === 0) {
+      drawPts = [[snx, sny]];
+      logCmd('Surface: 1er point — cliquez pour ajouter, Entrée pour fermer et calculer');
+    } else {
+      drawPts.push([snx, sny]);
+      logCmd('Surface: '+drawPts.length+' points — Entrée pour fermer');
+    }
+  }
+  else if (currentTool === 'spline') {
+    drawPts.push([snx, sny]);
+    logCmd(`Spline: point ${drawPts.length} ajouté — double-clic ou Entrée pour terminer`);
+  }
+  else if (currentTool === 'move') {
+    if (drawPts.length === 0) {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (!sel.length) { logCmd('Sélectionnez d\'abord des objets (Esc pour sélectionner).'); setTool('select'); }
+      else { drawPts = [[snx, sny]]; logCmd(`Déplacer: ${sel.length} objet(s) — cliquez la nouvelle position`); }
+    } else {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (sel.length) {
+        saveState();
+        const dx = snx - drawPts[0][0], dy = sny - drawPts[0][1];
+        for (const en of sel) translateEnt(en, dx, dy);
+        logCmd(`${sel.length} objet(s) déplacé(s) de (${dx.toFixed(1)},${dy.toFixed(1)})`);
+      }
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'copy') {
+    if (drawPts.length === 0) {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (!sel.length) { logCmd('Sélectionnez d\'abord des objets.'); setTool('select'); }
+      else { drawPts = [[snx, sny]]; logCmd(`Copier: ${sel.length} objet(s) — cliquez la destination`); }
+    } else {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (sel.length) {
+        saveState();
+        const dx = snx - drawPts[0][0], dy = sny - drawPts[0][1];
+        for (const en of sel) {
+          const c = cloneEnt(en);
+          translateEnt(c, dx, dy);
+          c.selected = false;
+          ENTITIES.push(c);
+        }
+        logCmd(`${sel.length} objet(s) copié(s)`);
+      }
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'rotate') {
+    if (drawPts.length === 0) {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (!sel.length) { logCmd('Sélectionnez d\'abord des objets.'); setTool('select'); }
+      else { drawPts = [[snx, sny]]; logCmd('Rotation: cliquez le 2e point pour définir l\'angle, ou tapez un angle'); }
+    } else {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (sel.length) {
+        const ang = prompt('Angle de rotation en degrés:', '0');
+        if (ang !== null) {
+          saveState();
+          const a = parseFloat(ang) * Math.PI / 180;
+          for (const en of sel) rotateEnt(en, drawPts[0], a);
+          logCmd(`${sel.length} objet(s) tourné(s) de ${ang}°`);
+        }
+      }
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'scale') {
+    if (drawPts.length === 0) {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (!sel.length) { logCmd('Sélectionnez d\'abord des objets.'); setTool('select'); }
+      else { drawPts = [[snx, sny]]; logCmd('Échelle: tapez le facteur'); }
+    } else {
+      const sel = ENTITIES.filter(en=>en.selected);
+      if (sel.length) {
+        const f = prompt('Facteur d\'échelle:', '1');
+        if (f !== null) {
+          const factor = parseFloat(f);
+          if (!isNaN(factor) && factor !== 0) {
+            saveState();
+            for (const en of sel) scaleEnt(en, drawPts[0], factor);
+            logCmd(`${sel.length} objet(s) mis à l'échelle ×${factor}`);
+          }
+        }
+      }
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'mirror') {
+    const sel = ENTITIES.filter(en=>en.selected);
+    if (drawPts.length < 2) {
+      if (!sel.length) { logCmd('Sélectionnez d\'abord des objets.'); setTool('select'); return; }
+      drawPts.push([snx, sny]);
+      logCmd(drawPts.length===1?'Symétrie: 1er point de l\'axe':'Symétrie: 2e point de l\'axe');
+    } else {
+      saveState();
+      const [p1, p2] = drawPts;
+      for (const en of sel) {
+        const c = cloneEnt(en);
+        mirrorEnt(c, p1, p2);
+        c.selected = false;
+        ENTITIES.push(c);
+      }
+      logCmd(`${sel.length} objet(s) symétrisé(s)`);
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'offset') {
+    if (drawPts.length === 0) {
+      const e = pickTopAt(snx, sny);
+      if (!e) { logCmd('Cliquez sur un objet à décaler.'); }
+      else {
+        const d = prompt('Distance de décalage:', '10');
+        if (d !== null) {
+          const dist = parseFloat(d);
+          if (!isNaN(dist) && dist !== 0) {
+            const side = confirm('OK = côté droit, Annuler = côté gauche') ? 1 : -1;
+            const offs = offsetEnt(e, dist * side);
+            if (offs) {
+              saveState();
+              if (Array.isArray(offs)) ENTITIES.push(...offs);
+              else ENTITIES.push(offs);
+              logCmd('Décalage créé');
+            }
+          }
+        }
+        setTool('select');
+      }
+    }
+  }
+  else if (currentTool === 'trim') {
+    const hit = pickTopAt(snx, sny);
+    if (hit) {
+      if (!window._trimCuts) window._trimCuts = [];
+      if (drawPts.length === 0) {
+        window._trimCuts.push(hit);
+        drawPts = [[snx, sny]];
+        logCmd(`Bord de coupe ajouté (${window._trimCuts.length}). Clic sur l'objet à ajuster, ou Entrée pour finir.`);
+      } else {
+        const result = trimEntAtPoint(hit, snx, sny, window._trimCuts);
+        if (result) {
+          saveState();
+          applyTrimResult(hit, result);
+          logCmd('Objet ajusté');
+        } else {
+          // Add another cutter
+          window._trimCuts.push(hit);
+          logCmd(`Bord de coupe ajouté (${window._trimCuts.length}).`);
+        }
+      }
+    }
+  }
+  else if (currentTool === 'extend') {
+    const hit = pickTopAt(snx, sny);
+    if (hit) {
+      if (!window._extBounds) window._extBounds = [];
+      if (drawPts.length === 0) {
+        window._extBounds.push(hit);
+        drawPts = [[snx, sny]];
+        logCmd(`Limite ajoutée (${window._extBounds.length}). Clic sur l'objet à prolonger, ou Entrée pour finir.`);
+      } else {
+        const extended = extendEntToBounds(hit, window._extBounds);
+        if (extended) {
+          saveState();
+          applyExtendResult(hit, extended);
+          logCmd('Objet prolongé');
+        } else {
+          window._extBounds.push(hit);
+          logCmd(`Limite ajoutée (${window._extBounds.length}).`);
+        }
+      }
+    }
+  }
+  else if (currentTool === 'dim') {
+    if (drawPts.length === 0) {
+      drawPts = [[snx, sny]];
+      logCmd('Cote: 1er point');
+    } else if (drawPts.length === 1) {
+      drawPts.push([snx, sny]);
+      logCmd('Cote: position de la ligne de cote');
+    } else {
+      const [p1, p2] = drawPts;
+      const d = Math.hypot(p2[0]-p1[0], p2[1]-p1[1]);
+      saveState();
+      ENTITIES.push({ id:nextId++, type:'DIM', layer:currentLayer,
+        p1, p2, pos:[snx, sny], value: d,
+        color: LAYER_DEF[currentLayer]?.color||'#ccc', lw: 0.4, selected:false });
+      logCmd(`Cote créée: ${d.toFixed(2)} m`);
+      drawPts = []; drawPreviewPt = null;
+    }
+  }
+  else if (currentTool === 'select') {
+    // Click to select single entity
+    const hit = hitTest(snx, sny);
+    if (hit) {
+      if (!e.shiftKey) ENTITIES.forEach(en=>en.selected=false);
+      hit.selected = !hit.selected;
+      updateSelCount();
+      showProps(hit);
+      logCmd(`Sélectionné: ${hit.type} [id:${hit.id}] calque:${hit.layer}`);
+    } else {
+      // Start selection box
+      if (!e.shiftKey) ENTITIES.forEach(en=>en.selected=false);
+      selBox = {x1:snx, y1:sny, x2:snx, y2:sny, cross:false};
+      updateSelCount();
+    }
+  }
+  redraw();
+});
+
+cadCanvas.addEventListener('mouseup', e => {
+  mouseDown = false;
+  if (panStart && (e.button===1||e.button===2)) { panStart=null; return; }
+  if (currentTool==='pan') { panStart=null; return; }
+  if (selBox) {
+    // Apply selection box
+    const [bx1,by1] = [Math.min(selBox.x1,selBox.x2), Math.min(selBox.y1,selBox.y2)];
+    const [bx2,by2] = [Math.max(selBox.x1,selBox.x2), Math.max(selBox.y1,selBox.y2)];
+    let cnt = 0;
+    for (const en of ENTITIES) {
+      if (entityInBox(en, bx1,by1,bx2,by2, selBox.cross)) { en.selected=true; cnt++; }
+    }
+    logCmd(`${cnt} objet(s) sélectionné(s)`);
+    selBox = null;
+    updateSelCount();
+    redraw();
+  }
+  panStart = null;
+});
+
+cadCanvas.addEventListener('dblclick', e => {
+  if (currentTool === 'pline' && drawPts.length >= 2) {
+    saveState();
+    const ld = LAYER_DEF[currentLayer];
+    ENTITIES.push({ id:nextId++, type:'LWPOLYLINE', layer:currentLayer,
+      pts:[...drawPts], color:ld?.color||'#ccc', lw:ld?.lw||0.6, selected:false });
+    logCmd(`Polyligne créée: ${drawPts.length} points`);
+    drawPts = []; drawPreviewPt = null; redraw();
+  }
+  if (currentTool === 'line' && drawPts.length > 0) {
+    drawPts = []; drawPreviewPt = null;
+    logCmd('Chaîne de lignes terminée');
+    redraw();
+  }
+});
+
+cadCanvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  if (currentTool === 'pline' && drawPts.length >= 2) {
+    saveState();
+    const ld = LAYER_DEF[currentLayer];
+    ENTITIES.push({ id:nextId++, type:'LWPOLYLINE', layer:currentLayer,
+      pts:[...drawPts], color:ld?.color||'#ccc', lw:ld?.lw||0.6, selected:false });
+    logCmd(`Polyligne créée: ${drawPts.length} points`);
+  }
+  drawPts=[]; drawPreviewPt=null; selBox=null; redraw();
+});
+
+cadCanvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = cadCanvas.getBoundingClientRect();
+  const cx = e.clientX-r.left, cy = e.clientY-r.top;
+  zoom(e.deltaY<0?1.12:1/1.12, cx, cy);
+}, {passive:false});
+
+// ── ZOOM ──
+function zoom(factor, cx, cy) {
+  if (cx===undefined) { const r=cadCanvas.getBoundingClientRect(); cx=r.width/2; cy=r.height/2; }
+  vpX = cx - (cx-vpX)*factor;
+  vpY = cy - (cy-vpY)*factor;
+  vpScale *= factor;
+  vpScale = Math.max(0.01, Math.min(500, vpScale));
+  drawGrid(); redraw();
+}
+function fitView() {
+  const W=cadCanvas.width, H=cadCanvas.height;
+  const sx=(W-40)/DX, sy=(H-40)/DY;
+  vpScale=Math.min(sx,sy);
+  vpX=(W-DX*vpScale)/2; vpY=(H-DY*vpScale)/2;
+  drawGrid(); redraw();
+}
+
+// ── HIT TEST ──
+function hitTest(sx, sy) {
+  const tol = 6 / vpScale;
+  for (let i=ENTITIES.length-1; i>=0; i--) {
+    const e = ENTITIES[i];
+    if (layerVisible[e.layer]===false) continue;
+    if (e.type==='LWPOLYLINE' && e.pts) {
+      for (let j=0; j<e.pts.length-1; j++) {
+        if (distToSeg(sx,sy,e.pts[j][0],e.pts[j][1],e.pts[j+1][0],e.pts[j+1][1]) < tol) return e;
+      }
+    }
+    if (e.type==='LINE') {
+      if (distToSeg(sx,sy,e.x1,e.y1,e.x2,e.y2) < tol) return e;
+    }
+    if (e.type==='CIRCLE') {
+      if (Math.abs(Math.hypot(sx-e.cx,sy-e.cy)-e.r) < tol) return e;
+    }
+    if (e.type==='POINT') {
+      if (Math.hypot(sx-e.x, sy-e.y) < tol*2) return e;
+    }
+    if (e.type==='TEXT') {
+      if (Math.abs(sx-e.x)<20/vpScale && Math.abs(sy-e.y)<10/vpScale) return e;
+    }
+    if (e.type==='RECT') {
+      const sides=[[e.x1,e.y1,e.x2,e.y1],[e.x2,e.y1,e.x2,e.y2],[e.x2,e.y2,e.x1,e.y2],[e.x1,e.y2,e.x1,e.y1]];
+      for(const [a,b,c,d] of sides) if(distToSeg(sx,sy,a,b,c,d)<tol) return e;
+    }
+  }
+  return null;
+}
+
+function dist(a, b) { return Math.hypot((b[0]||0) - (a[0]||0), (b[1]||0) - (a[1]||0)); }
+function distToSeg(px,py,ax,ay,bx,by) {
+  const dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;
+  if(len2===0) return Math.hypot(px-ax,py-ay);
+  let t=((px-ax)*dx+(py-ay)*dy)/len2;
+  t=Math.max(0,Math.min(1,t));
+  return Math.hypot(px-(ax+t*dx), py-(ay+t*dy));
+}
+
+function entityInBox(e, bx1,by1,bx2,by2, cross) {
+  const pts = e.pts || (e.type==='LINE'?[[e.x1,e.y1],[e.x2,e.y2]]:
+               e.type==='POINT'?[[e.x,e.y]]:
+               e.type==='CIRCLE'?[[e.cx,e.cy]]:
+               e.type==='TEXT'?[[e.x,e.y]]:[]);
+  if (!pts.length) return false;
+  const inBox = ([x,y])=>x>=bx1&&x<=bx2&&y>=by1&&y<=by2;
+  if (cross) return pts.some(inBox);
+  return pts.every(inBox);
+}
+
+// ── ENTITY HELPERS ──
+function pickTopAt(sx, sy) { return hitTest(sx, sy); }
+
+function cloneEnt(e){
+  const c = JSON.parse(JSON.stringify(e));
+  return c;
+}
+
+function translateEnt(e, dx, dy){
+  if(e.pts) e.pts = e.pts.map(p=>[p[0]+dx, p[1]+dy]);
+  if(e.type==='LINE'){ e.x1+=dx; e.y1+=dy; e.x2+=dx; e.y2+=dy; }
+  if(e.type==='CIRCLE' || e.type==='ARC'){ e.cx+=dx; e.cy+=dy; }
+  if(e.type==='POINT' || e.type==='TEXT'){ e.x+=dx; e.y+=dy; }
+  if(e.type==='RECT'){ e.x1+=dx; e.y1+=dy; e.x2+=dx; e.y2+=dy; }
+  if(e.type==='DIM'){ e.p1=[e.p1[0]+dx,e.p1[1]+dy]; e.p2=[e.p2[0]+dx,e.p2[1]+dy]; e.pos=[e.pos[0]+dx,e.pos[1]+dy]; }
+}
+
+function rotateEnt(e, c, a){
+  const s = Math.sin(a), cs = Math.cos(a);
+  const R = (p)=>{ const dx=p[0]-c[0], dy=p[1]-c[1]; return [c[0]+dx*cs-dy*s, c[1]+dx*s+dy*cs]; };
+  if(e.pts) e.pts = e.pts.map(R);
+  if(e.type==='LINE'){ [e.x1,e.y1]=R([e.x1,e.y1]); [e.x2,e.y2]=R([e.x2,e.y2]); }
+  if(e.type==='CIRCLE' || e.type==='ARC'){ [e.cx,e.cy]=R([e.cx,e.cy]); if(e.type==='ARC'){ e.startA+=a; e.endA+=a; } }
+  if(e.type==='POINT' || e.type==='TEXT'){ [e.x,e.y]=R([e.x,e.y]); }
+  if(e.type==='RECT'){ const c1=R([e.x1,e.y1]), c2=R([e.x2,e.y2]); e.x1=c1[0]; e.y1=c1[1]; e.x2=c2[0]; e.y2=c2[1]; }
+  if(e.type==='DIM'){ e.p1=R(e.p1); e.p2=R(e.p2); e.pos=R(e.pos); }
+}
+
+function scaleEnt(e, c, k){
+  const S = (p)=>[c[0]+(p[0]-c[0])*k, c[1]+(p[1]-c[1])*k];
+  if(e.pts) e.pts = e.pts.map(S);
+  if(e.type==='LINE'){ [e.x1,e.y1]=S([e.x1,e.y1]); [e.x2,e.y2]=S([e.x2,e.y2]); }
+  if(e.type==='CIRCLE' || e.type==='ARC'){ e.cx = c[0]+(e.cx-c[0])*k; e.cy = c[1]+(e.cy-c[1])*k; e.r *= k; }
+  if(e.type==='POINT' || e.type==='TEXT'){ [e.x,e.y]=S([e.x,e.y]); if(e.type==='TEXT') e.h *= k; }
+  if(e.type==='RECT'){ [e.x1,e.y1]=S([e.x1,e.y1]); [e.x2,e.y2]=S([e.x2,e.y2]); }
+  if(e.type==='DIM'){ e.p1=S(e.p1); e.p2=S(e.p2); e.pos=S(e.pos); e.value = Math.hypot(e.p2[0]-e.p1[0], e.p2[1]-e.p1[1]); }
+}
+
+function mirrorEnt(e, p1, p2){
+  const dx = p2[0]-p1[0], dy = p2[1]-p1[1], l2 = dx*dx+dy*dy;
+  const M = (p)=>{ if(l2===0) return [...p]; const t=((p[0]-p1[0])*dx+(p[1]-p1[1])*dy)/l2; const px=p1[0]+t*dx, py=p1[1]+t*dy; return [2*px-p[0], 2*py-p[1]]; };
+  if(e.pts) e.pts = e.pts.map(M);
+  if(e.type==='LINE'){ [e.x1,e.y1]=M([e.x1,e.y1]); [e.x2,e.y2]=M([e.x2,e.y2]); }
+  if(e.type==='CIRCLE' || e.type==='ARC'){ [e.cx,e.cy]=M([e.cx,e.cy]); if(e.type==='ARC'){ const ba=Math.atan2(dy,dx); e.startA=2*ba-e.startA; e.endA=2*ba-e.endA; } }
+  if(e.type==='POINT' || e.type==='TEXT'){ [e.x,e.y]=M([e.x,e.y]); }
+  if(e.type==='RECT'){ [e.x1,e.y1]=M([e.x1,e.y1]); [e.x2,e.y2]=M([e.x2,e.y2]); }
+  if(e.type==='DIM'){ e.p1=M(e.p1); e.p2=M(e.p2); e.pos=M(e.pos); }
+}
+
+function getEntSegments(e){
+  if(e.type==='LINE' || e.type==='LWPOLYLINE'){
+    const pts = e.pts || [[e.x1,e.y1],[e.x2,e.y2]];
+    const segs=[]; for(let i=0;i<pts.length-1;i++) segs.push([pts[i],pts[i+1]]);
+    return segs;
+  }
+  if(e.type==='RECT'){
+    const x1=Math.min(e.x1,e.x2), y1=Math.min(e.y1,e.y2), x2=Math.max(e.x1,e.x2), y2=Math.max(e.y1,e.y2);
+    return [[[x1,y1],[x2,y1]],[[x2,y1],[x2,y2]],[[x2,y2],[x1,y2]],[[x1,y2],[x1,y1]]];
+  }
+  return [];
+}
+
+function segIntersection(s1, s2){
+  const [a,b]=s1, [c,d]=s2;
+  const x1=a[0],y1=a[1],x2=b[0],y2=b[1],x3=c[0],y3=c[1],x4=d[0],y4=d[1];
+  const den = (x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+  if(Math.abs(den)<1e-10) return null;
+  const t = ((x1-x3)*(y3-y4)-(y1-y3)*(x3-x4))/den;
+  return [x1+t*(x2-x1), y1+t*(y2-y1)];
+}
+
+function offsetEnt(e, d){
+  if(e.type==='LINE'){
+    const dx=e.x2-e.x1, dy=e.y2-e.y1, len=Math.hypot(dx,dy);
+    if(!len) return null;
+    const nx=-dy/len*d, ny=dx/len*d;
+    return { type:'LINE', x1:e.x1+nx, y1:e.y1+ny, x2:e.x2+nx, y2:e.y2+ny, pts:[[e.x1+nx,e.y1+ny],[e.x2+nx,e.y2+ny]], layer:e.layer, color:e.color, lw:e.lw, selected:false };
+  }
+  if(e.type==='CIRCLE'){
+    return { type:'CIRCLE', cx:e.cx, cy:e.cy, r:e.r+d, layer:e.layer, color:e.color, lw:e.lw, selected:false };
+  }
+  if(e.type==='LWPOLYLINE' && e.pts && e.pts.length>=2){
+    const np = [];
+    for(let i=0;i<e.pts.length;i++){
+      const prev=e.pts[Math.max(0,i-1)], cur=e.pts[i], next=e.pts[Math.min(e.pts.length-1,i+1)];
+      const v1=[cur[0]-prev[0], cur[1]-prev[1]], v2=[next[0]-cur[0], next[1]-cur[1]];
+      const n1=[-v1[1],v1[0]], n2=[-v2[1],v2[0]];
+      const l1=Math.hypot(n1[0],n1[1])||1, l2=Math.hypot(n2[0],n2[1])||1;
+      n1[0]/=l1; n1[1]/=l1; n2[0]/=l2; n2[1]/=l2;
+      const m=[(n1[0]+n2[0])/2,(n1[1]+n2[1])/2];
+      const ml=Math.hypot(m[0],m[1])||1; m[0]/=ml; m[1]/=ml;
+      np.push([cur[0]+m[0]*d, cur[1]+m[1]*d]);
+    }
+    return { type:'LWPOLYLINE', pts:np, layer:e.layer, color:e.color, lw:e.lw, selected:false };
+  }
+  if(e.type==='RECT'){
+    const x1=Math.min(e.x1,e.x2), y1=Math.min(e.y1,e.y2), x2=Math.max(e.x1,e.x2), y2=Math.max(e.y1,e.y2);
+    if(d>0) return { type:'RECT', x1:x1-d, y1:y1-d, x2:x2+d, y2:y2+d, pts:[[x1-d,y1-d],[x2+d,y1-d],[x2+d,y2+d],[x1-d,y2+d],[x1-d,y1-d]], layer:e.layer, color:e.color, lw:e.lw, selected:false };
+    const dd=-d; if((x2-x1)>2*dd && (y2-y1)>2*dd) return { type:'RECT', x1:x1+dd, y1:y1+dd, x2:x2-dd, y2:y2-dd, pts:[[x1+dd,y1+dd],[x2-dd,y1+dd],[x2-dd,y2-dd],[x1+dd,y2-dd],[x1+dd,y1+dd]], layer:e.layer, color:e.color, lw:e.lw, selected:false };
+  }
+  return null;
+}
+
+function trimEntAtPoint(e, sx, sy, cutters){
+  const segs = getEntSegments(e);
+  if(!segs.length) return null;
+  const tol = 12 / vpScale;
+  for(const s of segs){
+    if(distToSeg(sx,sy,s[0][0],s[0][1],s[1][0],s[1][1]) > tol) continue;
+    for(const c of cutters){
+      if(c.id === e.id) continue;
+      const csegs = getEntSegments(c);
+      for(const cs of csegs){
+        const ip = segIntersection(s, cs);
+        if(ip){
+          return { segment:s, ip };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function applyTrimResult(e, result){
+  const { segment, ip } = result;
+  if(e.type==='LINE'){
+    // Determine which end to trim
+    const d1 = Math.hypot(e.x1-ip[0], e.y1-ip[1]);
+    const d2 = Math.hypot(e.x2-ip[0], e.y2-ip[1]);
+    const newSeg = (d1<d2) ? [[ip, segment[1]]] : [[segment[0], ip]];
+    e.pts = newSeg[0];
+    if(d1<d2){ e.x1=ip[0]; e.y1=ip[1]; } else { e.x2=ip[0]; e.y2=ip[1]; }
+  } else if(e.type==='LWPOLYLINE' || e.type==='RECT'){
+    const idx = e.pts.findIndex((p,i)=>i<e.pts.length-1 && (p===segment[0] || (Math.abs(p[0]-segment[0][0])<1e-9 && Math.abs(p[1]-segment[0][1])<1e-9)));
+    if(idx>=0){
+      e.pts[idx] = ip;
+    }
+  }
+}
+
+function extendEntToBounds(e, bounds){
+  if(e.type!=='LINE' && e.type!=='LWPOLYLINE') return null;
+  const segs = getEntSegments(e);
+  if(!segs.length) return null;
+  const tol = 12 / vpScale;
+  for(const s of segs){
+    for(const b of bounds){
+      if(b.id === e.id) continue;
+      const bsegs = getEntSegments(b);
+      for(const bs of bsegs){
+        const ip = segIntersection(s, bs);
+        if(ip){
+          // Extend the line in s to ip
+          if(e.type==='LINE'){
+            const d1 = Math.hypot(e.x1-s[1][0], e.y1-s[1][1]);
+            const d2 = Math.hypot(e.x2-s[1][0], e.y2-s[1][1]);
+            // extend whichever end is on the other side
+            if(d1 < d2) e.x1 = ip[0], e.y1 = ip[1];
+            else e.x2 = ip[0], e.y2 = ip[1];
+            e.pts = [[e.x1,e.y1],[e.x2,e.y2]];
+            return { ok:true };
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function applyExtendResult(e, result){ /* already mutated in extendEntToBounds */ }
+
+// ── MEASUREMENTS ──
+function drawMeasurements(){
+  if(!measurements || measurements.length === 0) return;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([]);
+  for(let i=0; i<measurements.length; i++){
+    const m = measurements[i];
+    if(m.type === 'dist'){
+      const [x1,y1] = svgToScreen(m.p1[0], m.p1[1]);
+      const [x2,y2] = svgToScreen(m.p2[0], m.p2[1]);
+      // Line
+      ctx.strokeStyle = '#facc15';
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      // Endpoints
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath(); ctx.arc(x1,y1,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x2,y2,3,0,Math.PI*2); ctx.fill();
+      // Label
+      const midX = (x1+x2)/2, midY = (y1+y2)/2;
+      const ang = Math.atan2(y2-y1, x2-x1);
+      const angLabel = ang > Math.PI/2 || ang < -Math.PI/2 ? ang + Math.PI : ang;
+      const offX = -Math.sin(ang) * 14, offY = Math.cos(ang) * 14;
+      const labelX = midX + offX, labelY = midY + offY;
+      ctx.save();
+      ctx.translate(labelX, labelY);
+      ctx.rotate(angLabel);
+      const fs = Math.max(10, 11 * Math.min(vpScale, 2));
+      ctx.font = `bold ${fs}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      // Background
+      const txt = m.dist.toFixed(3) + ' m';
+      const w = ctx.measureText(txt).width;
+      ctx.fillStyle = 'rgba(11,15,26,0.9)';
+      ctx.fillRect(-w/2-3, -fs-2, w+6, fs+4);
+      ctx.fillStyle = '#facc15';
+      ctx.fillText(txt, 0, 0);
+      ctx.textAlign = 'start';
+      ctx.textBaseline = 'middle';
+      ctx.restore();
+    } else if(m.type === 'length'){
+      // Show length as a label next to the entity
+      const e = ENTITIES.find(x => x.id === m.entityId);
+      if(!e) continue;
+      let pts = [];
+      if(e.pts) pts = e.pts;
+      else if(e.type === 'LINE') pts = [[e.x1, e.y1], [e.x2, e.y2]];
+      else if(e.type === 'CIRCLE' || e.type === 'ARC') pts = [[e.cx, e.cy]];
+      if(pts.length === 0) continue;
+      // Compute centroid
+      let cx=0, cy=0;
+      for(const p of pts){ cx += p[0]; cy += p[1]; }
+      cx /= pts.length; cy /= pts.length;
+      const [sx, sy] = svgToScreen(cx, cy);
+      const fs = Math.max(10, 11 * Math.min(vpScale, 2));
+      ctx.font = `bold ${fs}px monospace`;
+      ctx.textAlign = 'center';
+      const txt = m.total.toFixed(3) + ' m';
+      const w = ctx.measureText(txt).width;
+      ctx.fillStyle = 'rgba(11,15,26,0.9)';
+      ctx.fillRect(sx - w/2 - 3, sy - fs/2 - 2, w+6, fs+4);
+      ctx.fillStyle = '#22d3ee';
+      ctx.fillText(txt, sx, sy);
+      ctx.textAlign = 'start';
+    } else if(m.type === 'angle'){
+      // Draw arc + label
+      const [x1,y1] = svgToScreen(m.p1[0], m.p1[1]);
+      const [x2,y2] = svgToScreen(m.p2[0], m.p2[1]);
+      const [x3,y3] = svgToScreen(m.p3[0], m.p3[1]);
+      ctx.strokeStyle = '#a78bfa';
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x3,y3); ctx.stroke();
+      const a1 = Math.atan2(m.p1[1]-m.p2[1], m.p1[0]-m.p2[0]);
+      const a2 = Math.atan2(m.p3[1]-m.p2[1], m.p3[0]-m.p2[0]);
+      const r = 40;
+      ctx.beginPath();
+      ctx.arc(x2, y2, r, -a1, -a2, a1 > a2);
+      ctx.stroke();
+      ctx.fillStyle = '#a78bfa';
+      ctx.font = 'bold 12px monospace';
+      ctx.textAlign = 'center';
+      const midA = (a1 + a2) / 2;
+      ctx.fillText(m.angle.toFixed(2)+'°', x2 + Math.cos(midA)*r*0.7, y2 - Math.sin(midA)*r*0.7);
+      ctx.textAlign = 'start';
+    } else if(m.type === 'area'){
+      // Draw polygon outline + label
+      const pts = m.points;
+      if(pts.length < 3) continue;
+      ctx.strokeStyle = '#34d399';
+      ctx.fillStyle = 'rgba(52,211,153,0.1)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      const [s0x, s0y] = svgToScreen(pts[0][0], pts[0][1]);
+      ctx.moveTo(s0x, s0y);
+      for(let i=1; i<pts.length; i++){
+        const [sx, sy] = svgToScreen(pts[i][0], pts[i][1]);
+        ctx.lineTo(sx, sy);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // Label at centroid
+      let cx=0, cy=0;
+      for(const p of pts){ cx += p[0]; cy += p[1]; }
+      cx /= pts.length; cy /= pts.length;
+      const [sx, sy] = svgToScreen(cx, cy);
+      const fs = Math.max(11, 12 * Math.min(vpScale, 2));
+      ctx.font = `bold ${fs}px monospace`;
+      ctx.textAlign = 'center';
+      const txt = m.area.toFixed(2) + ' m²\n' + (m.area/10000).toFixed(4) + ' ha';
+      const lines = txt.split('\n');
+      let maxW = 0;
+      for(const l of lines) maxW = Math.max(maxW, ctx.measureText(l).width);
+      ctx.fillStyle = 'rgba(11,15,26,0.9)';
+      ctx.fillRect(sx - maxW/2 - 4, sy - fs*1.3, maxW+8, fs*2.4);
+      ctx.fillStyle = '#34d399';
+      for(let i=0; i<lines.length; i++) ctx.fillText(lines[i], sx, sy - fs*0.4 + i*fs);
+      ctx.textAlign = 'start';
+    }
+  }
+  // Draw preview measurement (during drawing)
+  if(currentTool === 'measure' && drawPts.length === 1 && drawPreviewPt){
+    const [x1,y1] = svgToScreen(drawPts[0][0], drawPts[0][1]);
+    const [x2,y2] = svgToScreen(drawPreviewPt[0], drawPreviewPt[1]);
+    ctx.strokeStyle = 'rgba(250,204,21,0.6)';
+    ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+    const dx = drawPreviewPt[0] - drawPts[0][0];
+    const dy = drawPreviewPt[1] - drawPts[0][1];
+    const d = Math.hypot(dx, dy);
+    const midX = (x1+x2)/2, midY = (y1+y2)/2;
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(11,15,26,0.9)';
+    const w = ctx.measureText(d.toFixed(3)+' m').width;
+    ctx.fillRect(midX - w/2 - 3, midY - 14, w+6, 16);
+    ctx.fillStyle = '#facc15';
+    ctx.fillText(d.toFixed(3)+' m', midX, midY - 2);
+    ctx.textAlign = 'start';
+  } else if(currentTool === 'measureArea' && drawPts.length >= 1 && drawPreviewPt){
+    const pts = [...drawPts, drawPreviewPt];
+    if(pts.length >= 2){
+      ctx.strokeStyle = 'rgba(52,211,153,0.7)';
+      ctx.setLineDash([4,3]);
+      ctx.beginPath();
+      const [s0x, s0y] = svgToScreen(pts[0][0], pts[0][1]);
+      ctx.moveTo(s0x, s0y);
+      for(let i=1; i<pts.length; i++){
+        const [sx, sy] = svgToScreen(pts[i][0], pts[i][1]);
+        ctx.lineTo(sx, sy);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Show area preview
+      let area = 0;
+      for(let i=0; i<pts.length; i++){
+        const j = (i+1) % pts.length;
+        area += pts[i][0] * pts[j][1] - pts[j][0] * pts[i][1];
+      }
+      area = Math.abs(area) / 2;
+      ctx.font = 'bold 12px monospace';
+      ctx.fillStyle = '#34d399';
+      ctx.textAlign = 'center';
+      ctx.fillText(area.toFixed(2) + ' m²', (svgToScreen(drawPreviewPt[0], drawPreviewPt[1]))[0] + 20, (svgToScreen(drawPreviewPt[0], drawPreviewPt[1]))[1] - 10);
+      ctx.textAlign = 'start';
+    }
+  }
+}
+
+function clearMeasurements(){ measurements = []; updateMeasurementsPanel(); redraw(); logCmd('Mesures effacées'); }
+function updateMeasurementsPanel(){
+  const body = document.getElementById('rp-body');
+  if(!body || currentPanel !== 'measures') return;
+  let h = `<div class="psec-title">Mesures (${measurements.length})</div>`;
+  if(measurements.length === 0){
+    h += '<div style="padding:10px;color:#6b7280;font-size:10px;">Aucune mesure.<br>Utilisez les outils Mesure dans la barre ou le menu Outils.</div>';
+  } else {
+    measurements.forEach((m, i) => {
+      const time = new Date(m.ts).toLocaleTimeString();
+      if(m.type === 'dist'){
+        h += `<div class="prow" style="cursor:pointer;" onclick="removeMeasurement(${i})" title="Cliquer pour supprimer">
+          <span class="pk">#${i+1} <span style="color:#facc15">↔</span> ${m.dist.toFixed(3)} m</span>
+          <span class="pv">${time}</span></div>
+          <div class="prow" style="font-size:9px;color:#4b5563;padding:0 6px 4px;">
+            ΔX=${m.dx.toFixed(2)} ΔY=${m.dy.toFixed(2)} ∠=${m.angle}°
+          </div>`;
+      } else if(m.type === 'length'){
+        h += `<div class="prow" style="cursor:pointer;" onclick="removeMeasurement(${i})" title="Cliquer pour supprimer">
+          <span class="pk">#${i+1} <span style="color:#22d3ee">→</span> L=${m.total.toFixed(3)} m</span>
+          <span class="pv">${time}</span></div>`;
+      } else if(m.type === 'angle'){
+        h += `<div class="prow" style="cursor:pointer;" onclick="removeMeasurement(${i})" title="Cliquer pour supprimer">
+          <span class="pk">#${i+1} <span style="color:#a78bfa">∠</span> ${m.angle.toFixed(2)}°</span>
+          <span class="pv">${time}</span></div>`;
+      } else if(m.type === 'area'){
+        h += `<div class="prow" style="cursor:pointer;" onclick="removeMeasurement(${i})" title="Cliquer pour supprimer">
+          <span class="pk">#${i+1} <span style="color:#34d399">▱</span> ${m.area.toFixed(2)} m²</span>
+          <span class="pv">${time}</span></div>
+          <div class="prow" style="font-size:9px;color:#4b5563;padding:0 6px 4px;">
+            ${(m.area/10000).toFixed(4)} ha · périm. ${m.perim.toFixed(2)} m
+          </div>`;
+      }
+    });
+    h += '<div style="padding:6px;"><button class="lbtn" style="width:100%" onclick="clearMeasurements()">🗑 Tout effacer</button></div>';
+  }
+  body.innerHTML = h;
+}
+function removeMeasurement(i){ measurements.splice(i, 1); updateMeasurementsPanel(); redraw(); }
+
+// ── SELECTION OPS ──
+function selectAll() {
+  ENTITIES.forEach(e=>e.selected=true);
+  updateSelCount(); redraw();
+}
+function deleteSelected() {
+  const sel = ENTITIES.filter(e=>e.selected);
+  if (!sel.length) { logCmd('Aucun objet sélectionné.'); return; }
+  saveState();
+  ENTITIES = ENTITIES.filter(e=>!e.selected);
+  logCmd(`${sel.length} objet(s) effacé(s).`);
+  updateSelCount(); redraw();
+}
+function updateSelCount() {
+  document.getElementById('s-sel').textContent = ENTITIES.filter(e=>e.selected).length;
+}
+function showProps(e) {
+  if (!e) return;
+  document.querySelectorAll('.rptab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.rptab').classList.add('active');
+  showPanel('props', document.querySelector('.rptab'));
+  document.getElementById('rp-body').innerHTML = buildPropsHtml(e);
+}
+
+// ── COMMAND LINE ──
+function logCmd(msg, type) {
+  const h = document.getElementById('cmdhist');
+  const d = document.createElement('div');
+  d.style.color = type==='err'?'#ef4444':type==='ok'?'#22c55e':'#4b5563';
+  d.innerHTML = msg;
+  h.appendChild(d);
+  h.scrollTop = 9999;
+  if (h.children.length > 80) h.removeChild(h.firstChild);
+}
+
+const CMD_MAP = {
+  'L':'line','LINE':'line','LIGNE':'line',
+  'PL':'pline','POLYLIGNE':'pline',
+  'SPL':'spline','SPLINE':'spline',
+  'C':'circle','CERCLE':'circle',
+  'A':'arc','ARC':'arc',
+  'REC':'rect','RECT':'rect','RECTANGLE':'rect',
+  'T':'text','TEXTE':'text','DT':'text',
+  'PO':'point','POINT':'point',
+  'DIM':'dim','COTE':'dim','COTATION':'dim',
+  'M':'move','MOVE':'move','DEPLACER':'move','DEPLACE':'move',
+  'CO':'copy','COPIER':'copy','COPY':'copy',
+  'RO':'rotate','ROTATION':'rotate','TOURNER':'rotate',
+  'SC':'scale','ECHELLE':'scale','SCALE':'scale',
+  'MI':'mirror','SYMETRIE':'mirror','MIROIR':'mirror','MIRROR':'mirror',
+  'O':'offset','DECALER':'offset','OFFSET':'offset',
+  'TR':'trim','AJUSTER':'trim','TRIM':'trim',
+  'EX':'extend','PROLONGER':'extend','ALLONGER':'extend','EXTEND':'extend',
+  'P':'pan','PAN':'pan','PANORAMIQUE':'pan',
+  'Z':'zoom','ZOOM':'zoom',
+  'ZE':'fitView','Z E':'fitView','ZOOM TOUT':'fitView','FIT':'fitView','ETENDU':'fitView',
+  'E':'select','ESC':'select','SELECT':'select','SELECTIONNER':'select',
+  'EFFACER':'deleteSelected','SUPPRIMER':'deleteSelected','DEL':'deleteSelected',
+  'ANNULER':'undo','U':'undo','UNDO':'undo',
+  'RETABLIR':'redo','REDO':'redo','R':'redo',
+  'TOUT':'selectAll','SEL TOUT':'selectAll','SELECT ALL':'selectAll',
+  'GRILLE':'toggleGrid','F7':'toggleGrid',
+  'ORTHO':'toggleOrtho','F8':'toggleOrtho',
+  'ACCROCHAGE':'toggleSnap','F3':'toggleSnap','SNAP':'toggleSnap',
+  'AIDE':'showHelp','HELP':'showHelp','?':'showHelp',
+  'COPIER SEL':'copySelected',
+};
+
+document.getElementById('cmdinput').addEventListener('keydown', function(ev) {
+  if (ev.key !== 'Enter') return;
+  const v = this.value.trim().toUpperCase();
+  this.value = '';
+  if (!v) { logCmd('(rien)'); return; }
+  logCmd(`<span style="color:#f59e0b">Commande: <b>${v}</b></span>`);
+  const fn = CMD_MAP[v];
+  if (fn === 'deleteSelected') deleteSelected();
+  else if (fn === 'fitView') fitView();
+  else if (fn === 'undo') undo();
+  else if (fn === 'redo') redo();
+  else if (fn === 'selectAll') selectAll();
+  else if (fn) setTool(fn);
+  else logCmd(`<span style="color:#ef4444">Commande inconnue: ${v}</span>`);
+});
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (e.target === document.getElementById('cmdinput')) return;
+  const k = e.key;
+  if (e.ctrlKey) {
+    if(k==='z'){e.preventDefault();undo();}
+    if(k==='y'){e.preventDefault();redo();}
+    if(k==='a'){e.preventDefault();selectAll();}
+    if(k==='s' && e.shiftKey){e.preventDefault();saveAsFile();return;}
+    if(k==='s'){e.preventDefault();saveFile();}
+    if(k==='o'){e.preventDefault();openFile();}
+    if(k==='c'){e.preventDefault();copySelected();}
+    return;
+  }
+  if(k==='Escape'){
+    drawPts=[];drawPreviewPt=null;selBox=null;window._trimCuts=null;window._extBounds=null;
+    setTool('select');ENTITIES.forEach(e=>e.selected=false);updateSelCount();redraw();
+    return;
+  }
+  if(k==='Delete'||k==='Backspace'){if(document.activeElement===document.body)deleteSelected();return;}
+  if(k==='Enter'){
+    if(currentTool==='pline'&&drawPts.length>=2){
+      saveState();
+      const ld=LAYER_DEF[currentLayer];
+      ENTITIES.push({id:nextId++,type:'LWPOLYLINE',layer:currentLayer,pts:[...drawPts],color:ld?.color||'#ccc',lw:ld?.lw||0.6,selected:false});
+      logCmd(`Polyligne: ${drawPts.length} pts`); drawPts=[]; drawPreviewPt=null; redraw();
+      return;
+    }
+    if(currentTool==='spline'&&drawPts.length>=3){
+      saveState();
+      const ld=LAYER_DEF[currentLayer];
+      ENTITIES.push({id:nextId++,type:'SPLINE',layer:currentLayer,pts:[...drawPts],color:ld?.color||'#ccc',lw:ld?.lw||0.6,selected:false});
+      logCmd(`Spline: ${drawPts.length} pts`); drawPts=[]; drawPreviewPt=null; redraw();
+      return;
+    }
+    if(currentTool==='line'){drawPts=[];drawPreviewPt=null;redraw();return;}
+    if(currentTool==='measureArea' && drawPts.length >= 3){
+      // Compute polygon area using shoelace formula
+      const pts = drawPts;
+      let area = 0;
+      for(let i=0; i<pts.length; i++){
+        const j = (i+1) % pts.length;
+        area += pts[i][0] * pts[j][1] - pts[j][0] * pts[i][1];
+      }
+      area = Math.abs(area) / 2;
+      // Perimeter
+      let perim = 0;
+      for(let i=0; i<pts.length; i++){
+        const j = (i+1) % pts.length;
+        perim += dist(pts[i], pts[j]);
+      }
+      measurements.push({type:'area', points: pts.slice(), area, perim, ts: Date.now()});
+      logCmd('<span style="color:#22c55e">✓ Surface: <b>'+area.toFixed(2)+' m²</b> ('+(area/10000).toFixed(4)+' ha) · périmètre: '+perim.toFixed(2)+' m</span>');
+      updateMeasurementsPanel();
+      drawPts=[]; drawPreviewPt=null; redraw();
+      return;
+    }
+    if(currentTool==='measureAngle' && drawPts.length === 2){
+      // wait for 3rd click
+      return;
+    }
+    if(currentTool==='measure' && drawPts.length === 1){
+      return;
+    }
+    if(currentTool==='measure'){drawPts=[];drawPreviewPt=null;redraw();return;}
+    if(currentTool==='measureLen'){return;}
+    if(currentTool==='measureAngle'){drawPts=[];drawPreviewPt=null;redraw();return;}
+    if(currentTool==='measureArea'){drawPts=[];drawPreviewPt=null;redraw();return;}
+    if(currentTool==='trim'){logCmd('Mode Ajuster terminé.'); window._trimCuts=null; setTool('select'); return;}
+    if(currentTool==='extend'){logCmd('Mode Prolonger terminé.'); window._extBounds=null; setTool('select'); return;}
+  }
+  // Function keys
+  if(k==='F3'){e.preventDefault();toggleSnap();return;}
+  if(k==='F7'){e.preventDefault();toggleGrid();return;}
+  if(k==='F8'){e.preventDefault();toggleOrtho();return;}
+  if(k==='F10'){e.preventDefault();togglePolaire();return;}
+  if(k==='F11'){e.preventDefault();toggleDyna();return;}
+  // Letter shortcuts
+  const ks={'l':'line','pl':'pline','spl':'spline','c':'circle','a':'arc','rec':'rect','r':'rect','t':'text','p':'pan','m':'move','co':'copy','ro':'rotate','sc':'scale','mi':'mirror','o':'offset','tr':'trim','ex':'extend','dim':'dim','z':'zoom','e':'select','spline':'spline','circle':'circle','rect':'rect','mes':'measure','measure':'measure','len':'measureLen','ang':'measureAngle','aire':'measureArea'};
+  const lk = k.toLowerCase();
+  if(ks[lk]&&!e.ctrlKey&&!e.altKey){setTool(ks[lk]);return;}
+});
+
+// ── MENU DROPDOWNS (click + hover hybrid) ──
+(function(){
+  const items = document.querySelectorAll('#menubar .menu-item');
+  let openItem = null;
+  function close(){ if(openItem){ openItem.classList.remove('open'); openItem=null; } }
+  items.forEach(it=>{
+    it.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(openItem===it){ close(); return; }
+      close();
+      openItem = it;
+      it.classList.add('open');
+    });
+    it.addEventListener('mouseenter', ()=>{
+      if(openItem && openItem!==it){ close(); openItem=it; it.classList.add('open'); }
+    });
+  });
+  document.addEventListener('click', e=>{
+    if(openItem && !openItem.contains(e.target)) close();
+  });
+  // Add CSS support for .menu-item.open .menu-drop
+  const style = document.createElement('style');
+  style.textContent = '.menu-item.open > .menu-drop{display:block;}';
+  document.head.appendChild(style);
+})();
+
+// ── SETTINGS ──
+function toggleGrid(){showGrid=!showGrid;drawGrid();redraw();syncStatusBar();logCmd('Grille '+(showGrid?'ON':'OFF'));}
+function toggleSnap(){snapOn=!snapOn;syncStatusBar();logCmd('Accrochage '+(snapOn?'ON':'OFF'));}
+function toggleOrtho(){orthoOn=!orthoOn;syncStatusBar();logCmd('Ortho '+(orthoOn?'ON':'OFF'));}
+function togglePolaire(){polarOn=!polarOn;syncStatusBar();logCmd('Suivi polaire '+(polarOn?'ON':'OFF'));}
+function toggleDyna(){dynaOn=!dynaOn;syncStatusBar();logCmd('Saisie dynamique '+(dynaOn?'ON':'OFF'));}
+function toggleLLig(){lLigOn=!lLigOn;syncStatusBar();logCmd('Ligne de liaison '+(lLigOn?'ON':'OFF'));}
+function syncStatusBar(){
+  const map={
+    'si-accrobj':snapOn,
+    'si-ortho':orthoOn,
+    'si-grille':showGrid,
+    'si-polaire':polarOn,
+    'si-dyna':dynaOn,
+    'si-llig':lLigOn,
+  };
+  for(const[id,v] of Object.entries(map)){
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('on',!!v);
+  }
+}
+
+// ── PANELS ──
+const LAYERS_LIST = Object.keys(LAYER_DEF);
+
+function showPanel(name, el) {
+  currentPanel = name;
+  document.querySelectorAll('.rptab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const body = document.getElementById('rp-body');
+  if(name==='props') {
+    const sel = ENTITIES.filter(e=>e.selected);
+    body.innerHTML = sel.length===1 ? buildPropsHtml(sel[0]) : buildNoSelHtml(sel.length);
+  } else if(name==='layers') {
+    body.innerHTML = buildLayersHtml();
+  } else if(name==='tools') {
+    body.innerHTML = buildToolsHtml();
+  } else if(name==='measures') {
+    updateMeasurementsPanel();
+  }
+}
+
+function buildNoSelHtml(n) {
+  return `<div style="padding:10px 6px">
+  <div class="psec-title">Général</div>
+  <div class="prow"><span class="pk">Objets sélectionnés</span><span class="pv">${n}</span></div>
+  <div class="prow"><span class="pk">Total entités</span><span class="pv">${ENTITIES.length}</span></div>
+  <div class="prow"><span class="pk">Calque actif</span><span class="pv ed" onclick="changeLayer()">${currentLayer}</span></div>
+  <div class="prow"><span class="pk">Outil actif</span><span class="pv">${currentTool.toUpperCase()}</span></div>
+  <div class="psec-title" style="margin-top:10px">Mesures</div>
+  <div class="prow"><span class="pk">Largeur (m)</span><span class="pv">1 276.0</span></div>
+  <div class="prow"><span class="pk">Hauteur (m)</span><span class="pv">1 868.0</span></div>
+  <div class="prow"><span class="pk">Superficie (ha)</span><span class="pv">238.4</span></div>
+  <div class="psec-title" style="margin-top:10px">Projection</div>
+  <div class="prow"><span class="pk">Système</span><span class="pv">UTM Zone 33N</span></div>
+  <div class="prow"><span class="pk">Datum</span><span class="pv">WGS 84</span></div>
+  <div class="prow"><span class="pk">Est min</span><span class="pv">362 559.977</span></div>
+  <div class="prow"><span class="pk">Nord min</span><span class="pv">3 360 679.9</span></div>
+  </div>`;
+}
+
+function buildPropsHtml(e) {
+  let rows = `<div class="prow"><span class="pk">Type</span><span class="pv">${e.type}</span></div>
+  <div class="prow"><span class="pk">ID</span><span class="pv">${e.id}</span></div>
+  <div class="prow"><span class="pk">Calque</span><span class="pv ed" onclick="changeEntityLayer(${e.id})">${e.layer}</span></div>
+  <div class="prow"><span class="pk">Couleur</span><span class="pv"><span style="display:inline-block;width:10px;height:10px;background:${e.color};border-radius:1px;margin-right:4px;vertical-align:middle"></span>${e.color}</span></div>
+  <div class="prow"><span class="pk">Épaisseur</span><span class="pv ed" onclick="changeEntityLW(${e.id})">${e.lw}</span></div>`;
+  if(e.type==='LWPOLYLINE'&&e.pts){
+    rows+=`<div class="prow"><span class="pk">Nb sommets</span><span class="pv">${e.pts.length}</span></div>`;
+    const len=e.pts.reduce((s,p,i)=>i>0?s+Math.hypot(p[0]-e.pts[i-1][0],p[1]-e.pts[i-1][1]):0,0);
+    rows+=`<div class="prow"><span class="pk">Longueur (m)</span><span class="pv">${len.toFixed(2)}</span></div>`;
+  }
+  if(e.type==='CIRCLE'){
+    rows+=`<div class="prow"><span class="pk">Centre X</span><span class="pv ed">${e.cx.toFixed(3)}</span></div>
+    <div class="prow"><span class="pk">Centre Y</span><span class="pv ed">${e.cy.toFixed(3)}</span></div>
+    <div class="prow"><span class="pk">Rayon (m)</span><span class="pv ed">${e.r.toFixed(3)}</span></div>
+    <div class="prow"><span class="pk">Circonférence</span><span class="pv">${(2*Math.PI*e.r).toFixed(2)} m</span></div>
+    <div class="prow"><span class="pk">Superficie</span><span class="pv">${(Math.PI*e.r*e.r).toFixed(2)} m²</span></div>`;
+  }
+  if(e.type==='TEXT'){
+    rows+=`<div class="prow"><span class="pk">Texte</span><span class="pv ed" onclick="editText(${e.id})">${e.text}</span></div>
+    <div class="prow"><span class="pk">Hauteur</span><span class="pv ed">${e.h}</span></div>`;
+  }
+  if(e.type==='POINT'){
+    const wx=XMIN+e.x, wy=YMIN+(DY-e.y);
+    rows+=`<div class="prow"><span class="pk">X SVG</span><span class="pv">${e.x.toFixed(3)}</span></div>
+    <div class="prow"><span class="pk">Y SVG</span><span class="pv">${e.y.toFixed(3)}</span></div>
+    <div class="prow"><span class="pk">Est (m)</span><span class="pv">${wx.toFixed(3)}</span></div>
+    <div class="prow"><span class="pk">Nord (m)</span><span class="pv">${wy.toFixed(3)}</span></div>`;
+  }
+  return `<div style="padding:6px"><div class="psec-title">Propriétés — ${e.type}</div>${rows}</div>
+  <div style="padding:6px;margin-top:4px">
+    <button class="lbtn" style="width:100%;margin-bottom:3px" onclick="deleteSelected()">🗑 Effacer</button>
+    <button class="lbtn" style="width:100%" onclick="ENTITIES.forEach(e=>e.selected=false);updateSelCount();redraw()">✕ Désélectionner</button>
+  </div>`;
+}
+
+function buildLayersHtml() {
+  let h=`<div class="lyr-hdr">
+    <button class="lbtn" onclick="addLayer()">+ Nouveau</button>
+    <button class="lbtn" onclick="allLayersOn()">☀ Tout</button>
+    <button class="lbtn" onclick="allLayersOff()">◑ Masquer</button>
+  </div>`;
+  for(const [name,def] of Object.entries(LAYER_DEF)){
+    const vis=layerVisible[name]!==false;
+    const cur=name===currentLayer;
+    const cnt=ENTITIES.filter(e=>e.layer===name).length;
+    h+=`<div class="lyr-row ${cur?'cur':''}" onclick="setCurrentLayer('${name}')">
+      <div class="ldot" style="background:${def.color}"></div>
+      <span class="lname ${cur?'cur':''}">${name}${cur?' ✔':''}</span>
+      <span style="color:#374151;font-size:9px">${cnt}</span>
+      <div class="lions">
+        <span class="licon" onclick="event.stopPropagation();toggleLayerVis('${name}',this)" title="${vis?'Visible':'Masqué'}">${vis?'👁':'🙈'}</span>
+      </div>
+    </div>`;
+  }
+  return h;
+}
+
+function buildToolsHtml() {
+  const tools=[
+    ['Dessin','line|Ligne╱','pline|Polyligne⌐','circle|Cercle○','arc|Arc⌒','rect|Rectangle□','text|Texte T'],
+    ['Modification','move|Déplacer⊹','copy|Copier⎘','rotate|Rotation↻','scale|Échelle⤢','mirror|Symétrie⇄'],
+    ['Sélection','select|Sélectionner↖','selectAll()|Tout Ctrl+A','deleteSelected()|Effacer Del'],
+    ['Vue','fitView()|Zoom étendu⊞','toggleGrid()|Grille F7','toggleOrtho()|Ortho F8','toggleSnap()|Accrochage F3'],
+  ];
+  let h='';
+  for(const [sec,...items] of tools){
+    h+=`<div class="tool-sec" style="border-bottom:1px solid #111827;padding-bottom:4px;margin-bottom:4px">
+    <div style="font-size:8px;color:#374151;text-transform:uppercase;letter-spacing:.8px;padding:6px 6px 3px">${sec}</div>`;
+    for(const item of items){
+      const [id,label]=item.split('|');
+      const icon=label.slice(-1);const name=label.slice(0,-1);
+      const action=id.includes('(')?id:`setTool('${id}')`;
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 10px;font-size:10px;color:#6b7280;cursor:pointer;border-radius:2px" onclick="${action}" onmouseover="this.style.background='#111827';this.style.color='#d1d5db'" onmouseout="this.style.background='';this.style.color='#6b7280'">
+        <span style="font-size:13px;width:16px;text-align:center">${icon}</span>${name}</div>`;
+    }
+    h+='</div>';
+  }
+  return h;
+}
+
+function setCurrentLayer(name){currentLayer=name;document.getElementById('cLayer').textContent=name;logCmd(`Calque actif: ${name}`);showPanel('layers');}
+function toggleLayerVis(name,el){layerVisible[name]=layerVisible[name]===false?true:false;showPanel('layers');redraw();}
+function addLayer(){
+  const n=prompt('Nom du nouveau calque:','Calque'+(Object.keys(LAYER_DEF).length+1));
+  if(!n)return;
+  const colors=['#38bdf8','#34d399','#f472b6','#a78bfa','#fb923c'];
+  LAYER_DEF[n]={color:colors[Math.floor(Math.random()*colors.length)],lw:0.6};
+  layerVisible[n]=true;
+  logCmd(`Calque créé: ${n}`);
+  showPanel('layers');
+}
+function allLayersOn(){Object.keys(LAYER_DEF).forEach(k=>layerVisible[k]=true);showPanel('layers');redraw();}
+function allLayersOff(){Object.keys(LAYER_DEF).forEach(k=>{if(k!==currentLayer)layerVisible[k]=false;});showPanel('layers');redraw();}
+
+// ── LAYER MANAGER (floating window) ──
+let _layerManagerEl = null;
+function showLayerManager(){
+  if(_layerManagerEl){
+    _layerManagerEl.style.display = 'flex';
+    refreshLayerManager();
+    return;
+  }
+  const el = document.createElement('div');
+  el.id = 'layerManager';
+  el.style.cssText = 'position:fixed;top:60px;right:280px;width:520px;max-height:70vh;background:#0d1117;border:1px solid #1f2937;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,0.7);z-index:200;display:flex;flex-direction:column;font-size:11px;';
+  el.innerHTML = `
+    <div style="background:#111827;padding:6px 10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #1f2937;border-radius:4px 4px 0 0;cursor:move;">
+      <span style="color:#60a5fa;font-weight:600;">Gestionnaire de calques</span>
+      <span style="color:#4b5563;font-size:10px;flex:1;" id="lmCount"></span>
+      <button class="lbtn" onclick="addLayerViaManager()">+ Nouveau</button>
+      <button class="lbtn" onclick="lmAllOn()">☀</button>
+      <button class="lbtn" onclick="lmAllOff()">◑</button>
+      <button class="lbtn" onclick="lmIsolate()">◎ Isoler</button>
+      <button class="lbtn" onclick="closeLayerManager()" title="Fermer">✕</button>
+    </div>
+    <div style="background:#111827;padding:3px 10px;display:grid;grid-template-columns:24px 24px 24px 1fr 60px 70px 60px;gap:6px;color:#6b7280;font-size:9px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #1f2937;">
+      <span title="Visibilité">ON</span>
+      <span title="Verrouillage">Lck</span>
+      <span title="Couleur"></span>
+      <span>Nom</span>
+      <span>Épaisseur</span>
+      <span>Nb entités</span>
+      <span></span>
+    </div>
+    <div id="lmList" style="flex:1;overflow-y:auto;"></div>
+  `;
+  document.body.appendChild(el);
+  _layerManagerEl = el;
+  // Make draggable
+  makeDraggable(el, el.firstChild);
+  refreshLayerManager();
+}
+
+function closeLayerManager(){
+  if(_layerManagerEl) _layerManagerEl.style.display = 'none';
+}
+
+function makeDraggable(el, handle){
+  let offX=0, offY=0, dragging=false;
+  handle.addEventListener('mousedown', e => {
+    if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+    dragging = true;
+    offX = e.clientX - el.offsetLeft;
+    offY = e.clientY - el.offsetTop;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    el.style.left = (e.clientX - offX) + 'px';
+    el.style.top = (e.clientY - offY) + 'px';
+  });
+  document.addEventListener('mouseup', () => dragging = false);
+}
+
+function refreshLayerManager(){
+  if(!_layerManagerEl) return;
+  const list = _layerManagerEl.querySelector('#lmList');
+  const count = _layerManagerEl.querySelector('#lmCount');
+  count.textContent = Object.keys(LAYER_DEF).length + ' calques · ' + ENTITIES.length + ' entités';
+  const names = Object.keys(LAYER_DEF);
+  let h = '';
+  for(const name of names){
+    const def = LAYER_DEF[name];
+    const vis = layerVisible[name] !== false;
+    const lock = def.locked;
+    const cur = name === currentLayer;
+    const cnt = ENTITIES.filter(e => e.layer === name).length;
+    h += `
+      <div style="display:grid;grid-template-columns:24px 24px 24px 1fr 60px 70px 60px;gap:6px;align-items:center;padding:3px 10px;${cur?'background:#0d1f38;':'background:'+ (cnt%2 ? '#0a0e14' : 'transparent') +';'}" data-lm-row="${name}">
+        <button onclick="lmToggleVis('${name}')" title="${vis?'Visible — cliquer pour masquer':'Masqué — cliquer pour afficher'}" style="background:transparent;border:none;color:${vis?'#60a5fa':'#374151'};cursor:pointer;font-size:14px;padding:0;">${vis?'👁':'🙈'}</button>
+        <button onclick="lmToggleLock('${name}')" title="${lock?'Verrouillé — cliquer pour déverrouiller':'Déverrouillé — cliquer pour verrouiller'}" style="background:transparent;border:none;color:${lock?'#f59e0b':'#374151'};cursor:pointer;font-size:12px;padding:0;">${lock?'🔒':'🔓'}</button>
+        <input type="color" value="${def.color}" onchange="lmChangeColor('${name}', this.value)" style="width:20px;height:18px;border:1px solid #374151;cursor:pointer;padding:0;background:transparent;" title="Couleur">
+        <input type="text" value="${name}" onchange="lmRename('${name}', this.value)" style="background:#111827;border:1px solid #1f2937;color:#e0e0e0;padding:2px 4px;font-size:11px;${cur?'font-weight:600;color:#60a5fa;':''}">
+        <input type="number" value="${def.lw||0.5}" step="0.1" min="0" onchange="lmChangeLW('${name}', this.value)" style="background:#111827;border:1px solid #1f2937;color:#e0e0e0;padding:2px 4px;font-size:10px;">
+        <span style="color:#6b7280;font-size:10px;text-align:right;">${cnt}</span>
+        <button onclick="lmSetCurrent('${name}')" style="background:${cur?'#1d4ed8':'#111827'};border:1px solid #374151;color:${cur?'#fff':'#6b7280'};cursor:pointer;font-size:9px;padding:2px 6px;border-radius:2px;">${cur?'Actif':'Activer'}</button>
+      </div>`;
+  }
+  list.innerHTML = h;
+}
+
+function lmToggleVis(name){
+  layerVisible[name] = layerVisible[name] === false ? true : false;
+  refreshLayerManager(); redraw(); showPanel('layers');
+  logCmd('Calque '+name+(layerVisible[name]===false?' masqué':' affiché'));
+}
+function lmToggleLock(name){
+  LAYER_DEF[name].locked = !LAYER_DEF[name].locked;
+  refreshLayerManager();
+  logCmd('Calque '+name+(LAYER_DEF[name].locked?' verrouillé':' déverrouillé'));
+}
+function lmChangeColor(name, hex){
+  LAYER_DEF[name].color = hex;
+  // Update entity colors that use this layer's color (no specific color set)
+  for(const e of ENTITIES){
+    if(e.layer === name && !e._explicitColor) e.color = hex;
+  }
+  refreshLayerManager(); showPanel('layers'); redraw();
+  logCmd('Couleur du calque '+name+' → '+hex);
+}
+function lmChangeLW(name, val){
+  const w = parseFloat(val);
+  if(isNaN(w) || w < 0) return;
+  LAYER_DEF[name].lw = w;
+  refreshLayerManager();
+}
+function lmRename(oldName, newName){
+  newName = newName.trim();
+  if(!newName || newName === oldName) return;
+  if(LAYER_DEF[newName]){ logCmd('<span style="color:#ef4444">Un calque "'+newName+'" existe déjà</span>'); return; }
+  LAYER_DEF[newName] = LAYER_DEF[oldName];
+  delete LAYER_DEF[oldName];
+  layerVisible[newName] = layerVisible[oldName];
+  delete layerVisible[oldName];
+  // Update entities
+  for(const e of ENTITIES) if(e.layer === oldName) e.layer = newName;
+  if(currentLayer === oldName) currentLayer = newName;
+  refreshLayerManager(); showPanel('layers'); redraw();
+  logCmd('Calque renommé: '+oldName+' → '+newName);
+}
+function lmSetCurrent(name){
+  currentLayer = name;
+  document.getElementById('cLayer').textContent = name;
+  refreshLayerManager(); showPanel('layers');
+  logCmd('Calque actif: '+name);
+}
+function lmAllOn(){
+  Object.keys(LAYER_DEF).forEach(k => layerVisible[k] = true);
+  refreshLayerManager(); redraw();
+}
+function lmAllOff(){
+  Object.keys(LAYER_DEF).forEach(k => { if(k !== currentLayer) layerVisible[k] = false; });
+  refreshLayerManager(); redraw();
+}
+function lmIsolate(){
+  const sel = prompt('Nom du calque à isoler (ou vide pour annuler):', currentLayer);
+  if(!sel || !LAYER_DEF[sel]) return;
+  Object.keys(LAYER_DEF).forEach(k => { layerVisible[k] = (k === sel); });
+  refreshLayerManager(); redraw();
+}
+function addLayerViaManager(){
+  const n = prompt('Nom du nouveau calque:', 'Calque'+(Object.keys(LAYER_DEF).length+1));
+  if(!n) return;
+  if(LAYER_DEF[n]){ logCmd('<span style="color:#ef4444">Calque existant</span>'); return; }
+  const colors = ['#38bdf8','#34d399','#f472b6','#a78bfa','#fb923c','#facc15','#22d3ee'];
+  LAYER_DEF[n] = { color: colors[Math.floor(Math.random()*colors.length)], lw: 0.5, visible: true };
+  layerVisible[n] = true;
+  currentLayer = n;
+  refreshLayerManager(); showPanel('layers'); redraw();
+  logCmd('Calque créé: '+n);
+}
+function changeLayer(){const n=prompt('Nouveau calque actif:',currentLayer);if(n&&LAYER_DEF[n])setCurrentLayer(n);}
+function changeEntityLayer(id){
+  const e=ENTITIES.find(x=>x.id===id);if(!e)return;
+  const n=prompt('Calque:',e.layer);
+  if(n&&LAYER_DEF[n]){e.layer=n;e.color=LAYER_DEF[n].color;saveState();redraw();showPanel('props',document.querySelector('.rptab'));}
+}
+function changeEntityLW(id){
+  const e=ENTITIES.find(x=>x.id===id);if(!e)return;
+  const n=parseFloat(prompt('Épaisseur de ligne:',e.lw));
+  if(!isNaN(n)){e.lw=n;saveState();redraw();}
+}
+function editText(id){
+  const e=ENTITIES.find(x=>x.id===id);if(!e)return;
+  const t=prompt('Modifier le texte:',e.text);
+  if(t!==null){saveState();e.text=t;redraw();}
+}
+
+// ── RIBBON ──
+const RIBBON_DATA = {
+  home:[
+    {n:'Dessin',t:['line|╱|Ligne','pline|⌐|Polyligne','circle|○|Cercle','arc|⌒|Arc','rect|□|Rectangle','spline|∿|Spline']},
+    {n:'Modification',t:['move|⊹|Déplacer','copy|⎘|Copier','rotate|↻|Rotation','scale|⤢|Échelle','mirror|⇄|Symétrie','offset|⊟|Décaler']},
+    {n:'Mesure',t:["setTool('measure')|↔|Distance","setTool('measureLen')|→|Longueur","setTool('measureAngle')|∠|Angle","setTool('measureArea')|▱|Surface","clearMeasurements()|🗑|Effacer"]},
+    {n:'Calques',t:["showLayerManager()|≡|Gestionnaire","allLayersOn()|☀|Tout ON","allLayersOff()|◑|Tout OFF"]},
+    {n:'Sélection',t:['selectAll()|⬚|Tout','deleteSelected()|🗑|Effacer','undo()|↩|Annuler','redo()|↪|Rétablir']},
+  ],
+  insert:[
+    {n:'Dessin',t:['line|╱|Ligne','circle|○|Cercle','rect|□|Rectangle','arc|⌒|Arc','text|T|Texte']},
+    {n:'Mesure',t:["setTool('measure')|↔|Distance","setTool('measureLen')|→|Longueur","setTool('measureAngle')|∠|Angle","setTool('measureArea')|▱|Surface","clearMeasurements()|🗑|Effacer"]},
+  ],
+  modify:[
+    {n:'Modification',t:['move|⊹|Déplacer','copy|⎘|Copier','rotate|↻|Rotation','scale|⤢|Échelle','mirror|⇄|Symétrie']},
+    {n:'Édition',t:['trim|✂|Ajuster','extend|→|Allonger','deleteSelected()|🗑|Effacer']},
+    {n:'Historique',t:['undo()|↩|Annuler','redo()|↪|Rétablir']},
+  ],
+  annot:[
+    {n:'Texte',t:['text|T|Texte','text|A|Texte multi']},
+    {n:'Cotes',t:['dim|↔|Linéaire','dim|↗|Alignée','dim|⌀|Diamètre','dim|R|Rayon']},
+  ],
+  view:[
+    {n:'Navigation',t:['fitView()|⊞|Tout afficher','pan|✋|Panoramique','zoom|🔍|Zoom']},
+    {n:'Affichage',t:['toggleGrid()|#|Grille','toggleOrtho()|⊞|Ortho','toggleSnap()|⊕|Accrochage']},
+    {n:'Calques',t:['layers|≡|Calques','allLayersOn()|☀|Tout ON','allLayersOff()|◑|Masquer']},
+  ],
+  layers:[
+    {n:'Gestion',t:["showLayerManager()|≡|Gestionnaire…","addLayerViaManager()|+|Nouveau calque"]},
+    {n:'Affichage',t:['allLayersOn()|☀|Tout ON','allLayersOff()|◑|Tout OFF','lmIsolate()|◎|Isoler courant']},
+    {n:'Sélection',t:["showPanel('layers')|⊞|Panneau latéral"]},
+  ],
+};
+
+document.getElementById('ribbon-tabs').addEventListener('click', e => {
+  const t=e.target.closest('.rtab');if(!t)return;
+  document.querySelectorAll('.rtab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  buildRibbon(t.dataset.tab);
+});
+
+function buildRibbon(tab) {
+  const groups=RIBBON_DATA[tab]||RIBBON_DATA.home;
+  const body=document.getElementById('ribbon-body');
+  body.innerHTML='';
+  for(const g of groups){
+    const gd=document.createElement('div'); gd.className='rgrp';
+    const tools=document.createElement('div'); tools.className='rtools';
+    for(const ts of g.t){
+      const [id,icon,label]=ts.split('|');
+      const btn=document.createElement('button'); btn.className='rtool';
+      btn.innerHTML=`<span class="ri">${icon}</span><span class="rl">${label}</span>`;
+      const action=id.includes('(')?id:`setTool('${id}')`;
+      btn.onclick=()=>{ try{eval(action);}catch(e){} };
+      tools.appendChild(btn);
+    }
+    const lbl=document.createElement('div'); lbl.className='rgrp-label'; lbl.textContent=g.n;
+    gd.appendChild(tools); gd.appendChild(lbl); body.appendChild(gd);
+  }
+}
+
+// ── MISC ──
+function newFile(){
+  if(ENTITIES.length > 0 && isModified && !confirm('Nouveau dessin ? Les modifications non enregistrées seront perdues.')) return;
+  saveState();
+  ENTITIES=[]; nextId=1; measurements=[]; currentFilename=null; currentFileFormat='json'; isModified=false;
+  logCmd('Nouveau dessin créé.'); updateTitle(); redraw();
+}
+function openJSON(){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = e => { handleOpenFile(e.target.files[0]); inp.value=''; };
+  inp.click();
+}
+
+function openDXF(){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.dxf,application/dxf,application/octet-stream';
+  inp.onchange = e => { handleOpenFile(e.target.files[0]); inp.value=''; };
+  inp.click();
+}
+
+function openFile(){
+  // Unified open dialog: JSON or DXF
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.dxf,.json,.dwg,application/dxf,application/json';
+  inp.onchange = e => { handleOpenFile(e.target.files[0]); inp.value=''; };
+  inp.click();
+}
+
+function handleOpenFile(file){
+  if(!file) return;
+  const name = (file.name||'').toLowerCase();
+  if(name.endsWith('.dwg')){
+    logCmd('<span style="color:#facc15">⚠ DWG binaire non supporté directement. Exportez en DXF depuis AutoCAD (Fichier → Enregistrer sous → DXF) puis ré-essayez.</span>');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      if(name.endsWith('.json')){
+        const data = JSON.parse(ev.target.result);
+        if(Array.isArray(data.entities)){
+          if(data.layers && typeof data.layers === 'object'){
+            for(const [k,v] of Object.entries(data.layers)){
+              if(!LAYER_DEF[k]) LAYER_DEF[k] = v;
+            }
+          }
+          saveState();
+          ENTITIES = data.entities;
+          nextId = (data.nextId || (data.entities.length ? Math.max(...data.entities.map(e=>e.id||0))+1 : 1));
+          if(Array.isArray(data.measurements)) measurements = data.measurements;
+          currentFilename = file.name;
+          currentFileFormat = 'json';
+          isModified = false;
+          updateTitle();
+          logCmd('✓ JSON chargé: '+ENTITIES.length+' entités depuis '+file.name);
+          updateLayerUI && updateLayerUI();
+          redraw(); fitView();
+        } else logCmd('<span style="color:#ef4444">Format JSON invalide</span>');
+      } else {
+        importDxfText(ev.target.result, file.name);
+      }
+    } catch(err){
+      console.error(err);
+      logCmd('<span style="color:#ef4444">Erreur: '+err.message+'</span>');
+    }
+  };
+  reader.onerror = () => logCmd('<span style="color:#ef4444">Impossible de lire le fichier</span>');
+  reader.readAsText(file);
+}
+
+function importDxfText(text, filename){
+  if(!text || text.length < 10){ logCmd('<span style="color:#ef4444">Fichier DXF vide ou invalide</span>'); return; }
+  const result = parseDxf(text);
+  if(!result.ok){ logCmd('<span style="color:#ef4444">Échec parsing DXF: '+result.error+'</span>'); return; }
+  if(result.entities.length === 0){ logCmd('<span style="color:#facc15">⚠ Aucune entité trouvée dans le DXF</span>'); return; }
+  if(!confirm('Importer '+result.entities.length+' entités depuis '+filename+'\n(Cela remplacera le dessin actuel. Ctrl+Z pour annuler après)')) return;
+  saveState();
+  ENTITIES = result.entities;
+  nextId = Math.max(...ENTITIES.map(e=>e.id||0), 0) + 1;
+  if(result.layers){
+    for(const [k,v] of Object.entries(result.layers)){
+      if(!LAYER_DEF[k]) LAYER_DEF[k] = v;
+    }
+  }
+  // Update layer panel
+  if(typeof updateLayerUI === 'function') updateLayerUI();
+  currentFilename = filename;
+  currentFileFormat = filename.toLowerCase().endsWith('.dwg') ? 'dwg' : 'dxf';
+  isModified = false;
+  updateTitle();
+  logCmd('✓ DXF importé: '+ENTITIES.length+' entités, '+Object.keys(result.layers||{}).length+' calques depuis '+filename);
+  redraw(); fitView();
+}
+
+function parseDxf(text){
+  try {
+    const lines = text.split(/\r?\n/);
+    const tok = (i) => { const c = parseInt(lines[i].trim()); const v = (lines[i+1]||'').trim(); return {code:c, val:v, next:i+2}; };
+    // Pass 1: collect TABLES (LAYER)
+    const layersFound = {};
+    let i = 0;
+    while(i < lines.length){
+      const r = tok(i);
+      if(r.code === 0 && /SECTION|EOF|ENDSEC|TABLE|ENDTAB/.test(r.val)) { i = r.next; continue; }
+      if(r.code === 2 && r.val === 'TABLES'){
+        // scan tables
+        i = r.next;
+        while(i < lines.length){
+          const t = tok(i);
+          if(t.code === 0 && t.val === 'ENDSEC') { i = t.next; break; }
+          if(t.code === 2 && t.val === 'LAYER'){
+            // Read LAYER entries
+            let curLayer = null;
+            const aciMap = {1:'#ff0000',2:'#ffff00',3:'#00ff00',4:'#00ffff',5:'#0000ff',6:'#ff00ff',7:'#ffffff',8:'#414141',9:'#808080',30:'#ffaa00',40:'#00bd00',140:'#0000bd',210:'#bd5e81',231:'#bd8181',232:'#ff8181'};
+            while(i < lines.length){
+              const e = tok(i);
+              if(e.code === 0) { i = e.next; break; } // next entity or ENDTAB
+              if(e.code === 2){ layersFound[e.val] = { name:e.val }; curLayer = e.val; }
+              if(e.code === 70) { /* flags */ }
+              if(e.code === 62){
+                const c = parseInt(e.val);
+                if(!isNaN(c) && c >= 0 && curLayer){
+                  layersFound[curLayer] = Object.assign(layersFound[curLayer]||{name:curLayer}, {aci:c, color: aciMap[c] || '#ffffff'});
+                }
+              }
+              if(e.code === 420 && curLayer){
+                const hex = trueColorToHex(parseInt(e.val));
+                if(hex) layersFound[curLayer] = Object.assign(layersFound[curLayer]||{name:curLayer}, {trueColor:hex, color:hex});
+              }
+              if(e.code === 6){ /* linetype */ }
+              i = e.next;
+            }
+            continue;
+          }
+          i = t.next;
+        }
+        continue;
+      }
+      i = r.next;
+    }
+
+    // Pass 2: collect ENTITIES
+    const entities = [];
+    let cur = null;
+    let polyClosed = false;
+    let polyElev = 0;
+    let mtext = null;
+    i = 0;
+    let inEntities = false;
+    while(i < lines.length){
+      const r = tok(i);
+      if(r.code === 0){
+        if(r.val === 'SECTION'){
+          const n = tok(r.next);
+          inEntities = (n.code === 2 && n.val === 'ENTITIES');
+          i = n.next; continue;
+        }
+        if(r.val === 'ENDSEC' || r.val === 'EOF'){
+          if(cur) finalizeDxfEntity(cur, entities, layersFound);
+          cur = null; inEntities = false;
+          if(r.val === 'EOF') break;
+          i = r.next; continue;
+        }
+        if(!inEntities){ i = r.next; continue; }
+        if(cur) finalizeDxfEntity(cur, entities, layersFound);
+        cur = { type: r.val.toUpperCase(), layer: '0', aci: 7, color: '#ffffff', lw: 0.5 };
+        polyClosed = false; polyElev = 0; mtext = null;
+        i = r.next; continue;
+      }
+      if(!inEntities || !cur){ i = r.next; continue; }
+      // Handle by type
+      if(cur.type === 'LWPOLYLINE' || cur.type === 'POLYLINE'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62){ cur.aci = parseInt(r.val); }
+        else if(r.code === 420){ cur._trueColor = trueColorToHex(parseInt(r.val)); }
+        else if(r.code === 70){ polyClosed = (parseInt(r.val) & 1) === 1; cur.closed = polyClosed; }
+        else if(r.code === 10){ cur._px = parseFloat(r.val); }
+        else if(r.code === 20){
+          cur._py = parseFloat(r.val);
+          if(!cur._pts) cur._pts = [];
+          cur._pts.push([cur._px, cur._py]);
+        }
+        else if(r.code === 30){ polyElev = parseFloat(r.val); }
+        else if(r.code === 42){ cur._bulge = parseFloat(r.val); }
+        else if(r.code === 6) cur.lineType = r.val;
+        else if(r.code === 370){ cur.lw = (parseInt(r.val) || 0) / 100; }
+        else if(r.code === 90){ /* vertex count, ignore */ }
+      } else if(cur.type === 'LINE'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 420) cur._trueColor = trueColorToHex(parseInt(r.val));
+        else if(r.code === 10) cur.x1 = parseFloat(r.val);
+        else if(r.code === 20) cur.y1 = parseFloat(r.val);
+        else if(r.code === 30) {/* z */}
+        else if(r.code === 11) cur.x2 = parseFloat(r.val);
+        else if(r.code === 21) cur.y2 = parseFloat(r.val);
+        else if(r.code === 31) {/* z */}
+        else if(r.code === 370) cur.lw = parseInt(r.val)/100;
+        else if(r.code === 6) cur.lineType = r.val;
+      } else if(cur.type === 'CIRCLE'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 420) cur._trueColor = trueColorToHex(parseInt(r.val));
+        else if(r.code === 10) cur.cx = parseFloat(r.val);
+        else if(r.code === 20) cur.cy = parseFloat(r.val);
+        else if(r.code === 40) cur.r = parseFloat(r.val);
+        else if(r.code === 370) cur.lw = parseInt(r.val)/100;
+      } else if(cur.type === 'ARC'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 420) cur._trueColor = trueColorToHex(parseInt(r.val));
+        else if(r.code === 10) cur.cx = parseFloat(r.val);
+        else if(r.code === 20) cur.cy = parseFloat(r.val);
+        else if(r.code === 40) cur.r = parseFloat(r.val);
+        else if(r.code === 50) cur.startA = parseFloat(r.val) * Math.PI / 180;
+        else if(r.code === 51) cur.endA = parseFloat(r.val) * Math.PI / 180;
+        else if(r.code === 370) cur.lw = parseInt(r.val)/100;
+      } else if(cur.type === 'ELLIPSE'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 420) cur._trueColor = trueColorToHex(parseInt(r.val));
+        else if(r.code === 10) cur.cx = parseFloat(r.val);
+        else if(r.code === 20) cur.cy = parseFloat(r.val);
+        else if(r.code === 11) cur.mx = parseFloat(r.val);
+        else if(r.code === 21) cur.my = parseFloat(r.val);
+        else if(r.code === 40) cur.ratio = parseFloat(r.val);
+        else if(r.code === 41) cur.startP = parseFloat(r.val);
+        else if(r.code === 42) cur.endP = parseFloat(r.val);
+      } else if(cur.type === 'POINT'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 420) cur._trueColor = trueColorToHex(parseInt(r.val));
+        else if(r.code === 10) cur.x = parseFloat(r.val);
+        else if(r.code === 20) cur.y = parseFloat(r.val);
+      } else if(cur.type === 'TEXT' || cur.type === 'MTEXT'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 420) cur._trueColor = trueColorToHex(parseInt(r.val));
+        else if(r.code === 10) cur.x = parseFloat(r.val);
+        else if(r.code === 20) cur.y = parseFloat(r.val);
+        else if(r.code === 40) cur.h = parseFloat(r.val);
+        else if(r.code === 1){ if(cur.type === 'TEXT') cur.text = r.val; else (mtext = (mtext||'') + r.val); }
+        else if(r.code === 3){ mtext = (mtext||'') + r.val; }
+        else if(r.code === 50) cur.rot = parseFloat(r.val) * Math.PI / 180;
+        if(cur.type === 'MTEXT' && mtext) cur.text = mtext;
+      } else if(cur.type === 'SOLID' || cur.type === '3DFACE'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 62) cur.aci = parseInt(r.val);
+        else if(r.code === 10) cur._x1 = parseFloat(r.val);
+        else if(r.code === 20) cur._y1 = parseFloat(r.val);
+        else if(r.code === 11) cur._x2 = parseFloat(r.val);
+        else if(r.code === 21) cur._y2 = parseFloat(r.val);
+        else if(r.code === 12) cur._x3 = parseFloat(r.val);
+        else if(r.code === 22) cur._y3 = parseFloat(r.val);
+        else if(r.code === 13) cur._x4 = parseFloat(r.val);
+        else if(r.code === 23) cur._y4 = parseFloat(r.val);
+      } else if(cur.type === 'HATCH'){
+        if(r.code === 8) cur.layer = r.val;
+      } else if(cur.type === 'INSERT'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 2) cur.blockName = r.val;
+        else if(r.code === 10) cur.x = parseFloat(r.val);
+        else if(r.code === 20) cur.y = parseFloat(r.val);
+        else if(r.code === 41) cur.scale = parseFloat(r.val);
+        else if(r.code === 50) cur.rot = parseFloat(r.val) * Math.PI / 180;
+      } else if(cur.type === 'SPLINE'){
+        if(r.code === 8) cur.layer = r.val;
+        else if(r.code === 10) cur._px = parseFloat(r.val);
+        else if(r.code === 20) cur._py = parseFloat(r.val);
+        else if(r.code === 30) {/* z */}
+      }
+      i = r.next;
+    }
+    if(cur) finalizeDxfEntity(cur, entities, layersFound);
+
+    // Build default layer defs for any new layers
+    const finalLayers = {};
+    const colors = ['#c8c8c8','#00bfff','#00e676','#ffa726','#9e9e9e','#ff7043','#ce93d8','#80deea','#f48fb1','#66bb6a','#ef5350','#a78bfa','#fb923c','#38bdf8','#f472b6','#facc15'];
+    let ci = 0;
+    for(const e of entities){
+      const ln = e.layer || '0';
+      if(!finalLayers[ln]){
+        const fromFile = layersFound[ln];
+        finalLayers[ln] = {
+          color: fromFile && fromFile.color ? fromFile.color : colors[ci++ % colors.length],
+          lw: e.lw || 0.5,
+          visible: true,
+        };
+      }
+    }
+    return { ok:true, entities, layers: finalLayers };
+  } catch(err){
+    return { ok:false, error: err.message };
+  }
+}
+
+function finalizeDxfEntity(cur, out, layersFound){
+  // Convert DXF ACI color to hex
+  const aciColors = [null,'#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#ffffff','#414141','#808080','#ff0000','#ffaaaa','#bd0000','#bd7e7e','#810000','#810000','#bd5e00','#ffaa00','#bd7e00','#bd7e40','#813e00','#813e00','#00bd00','#00ff00','#00bd5e','#00bd7e','#00bd81','#00bd00','#005e00','#aaffaa','#005e5e','#00bd7e','#00bd81','#005e5e','#005e81','#0000ff','#aaaaff','#0000bd','#5e5ebd','#5e5e81','#000081','#5e5e81','#aa00ff','#ffaaff','#bd00bd','#bd5ebd','#810081','#810081','#bd5e81','#bd5e81','#aaffff','#00ffff','#aaffff','#00bd7e','#00bd81','#00ffff','#005e5e','#00bd81','#005e5e','#bd8181','#ff8181','#bd8181','#bd5e5e','#813e3e','#813e3e','#ffffff','#ffffff'];
+  // Use true color (24-bit) first, then ACI, then layer color
+  const layerInfo = layersFound[cur.layer];
+  const layerColor = layerInfo && layerInfo.color ? layerInfo.color : null;
+  let color;
+  if(cur._trueColor){
+    color = cur._trueColor;
+  } else if(cur.aci !== undefined && cur.aci !== null && cur.aci >= 0 && aciColors[cur.aci]){
+    color = aciColors[cur.aci];
+  } else if(layerColor){
+    color = layerColor;
+  } else {
+    color = '#ffffff';
+  }
+  if(cur.type === 'LWPOLYLINE' || cur.type === 'POLYLINE'){
+    if(cur._pts && cur._pts.length){
+      out.push({ id: nextId++, type: 'LWPOLYLINE', pts: cur._pts, layer: cur.layer||'0', color, lw: cur.lw||0.5, closed: cur.closed||false, selected:false });
+    }
+  } else if(cur.type === 'LINE'){
+    if(cur.x1!==undefined && cur.x2!==undefined){
+      out.push({ id: nextId++, type: 'LINE', x1:cur.x1, y1:cur.y1, x2:cur.x2, y2:cur.y2, pts:[[cur.x1,cur.y1],[cur.x2,cur.y2]], layer: cur.layer||'0', color, lw: cur.lw||0.5, selected:false });
+    }
+  } else if(cur.type === 'CIRCLE'){
+    if(cur.cx!==undefined && cur.r!==undefined){
+      out.push({ id: nextId++, type: 'CIRCLE', cx:cur.cx, cy:cur.cy, r:cur.r, layer: cur.layer||'0', color, lw: cur.lw||0.5, selected:false });
+    }
+  } else if(cur.type === 'ARC'){
+    if(cur.cx!==undefined && cur.r!==undefined){
+      out.push({ id: nextId++, type: 'ARC', cx:cur.cx, cy:cur.cy, r:cur.r, startA: cur.startA||0, endA: cur.endA||Math.PI*2, layer: cur.layer||'0', color, lw: cur.lw||0.5, selected:false });
+    }
+  } else if(cur.type === 'ELLIPSE'){
+    if(cur.cx!==undefined && cur.mx!==undefined && cur.ratio){
+      const len = Math.hypot(cur.mx||0, cur.my||0);
+      out.push({ id: nextId++, type: 'ELLIPSE', cx:cur.cx, cy:cur.cy, rx:len, ry:len*(cur.ratio||1), rotation: Math.atan2(cur.my||0, cur.mx||0), layer: cur.layer||'0', color, lw: cur.lw||0.5, selected:false });
+    }
+  } else if(cur.type === 'POINT'){
+    if(cur.x!==undefined){
+      out.push({ id: nextId++, type: 'POINT', x:cur.x, y:cur.y, layer: cur.layer||'0', color, lw: cur.lw||0.5, selected:false });
+    }
+  } else if(cur.type === 'TEXT' || cur.type === 'MTEXT'){
+    if(cur.x!==undefined && cur.text){
+      out.push({ id: nextId++, type: 'TEXT', x:cur.x, y:cur.y, text:cur.text, h:cur.h||10, layer: cur.layer||'0', color, lw: 0.4, selected:false });
+    }
+  } else if(cur.type === 'SOLID' || cur.type === '3DFACE'){
+    // Convert to polyline if we have enough points
+    if(cur._x1!==undefined && cur._x2!==undefined && cur._x3!==undefined){
+      const pts = [[cur._x1,cur._y1],[cur._x2,cur._y2],[cur._x3,cur._y3]];
+      if(cur._x4!==undefined && (cur._x4!==cur._x1 || cur._y4!==cur._y1)) pts.push([cur._x4,cur._y4]);
+      out.push({ id: nextId++, type: 'LWPOLYLINE', pts, layer: cur.layer||'0', color, lw: cur.lw||0.5, closed:true, selected:false });
+    }
+  } else if(cur.type === 'HATCH'){
+    // Hatches are complex; just record the boundary as a layer hint
+    if(cur.boundary){ /* TODO */ }
+  } else if(cur.type === 'SPLINE'){
+    if(cur._pts && cur._pts.length>=2){
+      out.push({ id: nextId++, type: 'SPLINE', pts:cur._pts, layer: cur.layer||'0', color, lw: cur.lw||0.5, selected:false });
+    }
+  }
+  // INSERT and HATCH: silently skipped (blocks/hatches need recursive parsing)
+}
+// ── SAVE / SAVE AS ──
+function markModified(){
+  isModified = true;
+  updateTitle();
+}
+
+// ── MODAL DIALOG ──
+let _modalCallback = null;
+function showModal(title, bodyHtml, okCallback){
+  document.getElementById('modalTitle').textContent = title;
+  const buttons = '<div class="modal-buttons"><button data-modal-cancel>Annuler</button><button class="primary" data-modal-ok>OK</button></div>';
+  document.getElementById('modalBody').innerHTML = bodyHtml + buttons;
+  _modalCallback = okCallback || null;
+  document.getElementById('modalBg').classList.add('active');
+  setTimeout(() => {
+    const firstInput = document.querySelector('#modalBody input, #modalBody select, #modalBody textarea');
+    if(firstInput) firstInput.focus();
+  }, 50);
+}
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('active');
+  _modalCallback = null;
+}
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalBg').addEventListener('click', e => {
+  if(e.target.id === 'modalBg') closeModal();
+  if(e.target.dataset.modalCancel !== undefined) closeModal();
+  if(e.target.dataset.modalOk !== undefined){
+    if(_modalCallback) _modalCallback();
+    closeModal();
+  }
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && document.getElementById('modalBg').classList.contains('active')) closeModal();
+  if(e.key === 'Enter' && document.getElementById('modalBg').classList.contains('active') && e.target.tagName !== 'TEXTAREA'){
+    e.preventDefault();
+    if(_modalCallback) _modalCallback();
+    closeModal();
+  }
+});
+function updateTitle(){
+  const titleEl = document.querySelector('#titlebar h1');
+  if(!titleEl) return;
+  const name = currentFilename || 'Sans titre';
+  const star = isModified ? ' *' : '';
+  titleEl.innerHTML = 'AutoCAD 2024 — <span class="tb-file">'+name+star+'</span> [Édition]';
+}
+
+function saveFile(){
+  // If we have a current filename, save to it. Otherwise, Save As.
+  if(currentFilename && currentFileFormat){
+    writeFile(currentFilename, currentFileFormat);
+  } else {
+    saveAsFile();
+  }
+}
+
+function saveAsFile(){
+  // Show modal for filename + format
+  const defaultName = currentFilename || 'dessin.json';
+  const ext = defaultName.match(/\.(json|dxf|dwg)$/i);
+  const baseName = defaultName.replace(/\.(json|dxf|dwg)$/i, '');
+  const defaultExt = ext ? ext[1].toLowerCase() : 'json';
+  showModal('Enregistrer sous…', `
+    <div class="modal-row"><label>Nom du fichier</label>
+      <input type="text" id="saveAsName" value="${baseName}" style="font-family:monospace;"></div>
+    <div class="modal-row"><label>Format</label>
+      <select id="saveAsFormat" style="font-family:monospace;">
+        <option value="json"${defaultExt==='json'?' selected':''}>JSON (.json) — format natif, préserve tout</option>
+        <option value="dxf"${defaultExt==='dxf'?' selected':''}>DXF (.dxf) — AutoCAD R12, compatible</option>
+        <option value="dwg"${defaultExt==='dwg'?' selected':''}>DWG (.dwg) — format AutoCAD (binaire)</option>
+      </select></div>
+    <div style="font-size:11px;color:#6b7280;padding:4px 8px;line-height:1.5;">
+      <b>JSON</b> : format interne, conserve calques, mesures, historique. Rechargeable à 100% dans cette app.<br>
+      <b>DXF</b> : AutoCAD R12 ASCII. Compatible avec AutoCAD, BricsCAD, LibreCAD, QGIS.<br>
+      <b>DWG</b> : AutoCAD binaire. Cette app ne peut pas écrire le binaire DWG ; le fichier produit est en réalité du DXF renommé (.dwg), ce qui est lu par la plupart des visionneuses CAO.
+    </div>
+  `, () => {
+    const name = (document.getElementById('saveAsName').value || 'dessin').trim();
+    const fmt = document.getElementById('saveAsFormat').value;
+    if(!name) return;
+    writeFile(name, fmt, true);
+  });
+  // Auto-update extension when format changes
+  setTimeout(() => {
+    const nameInput = document.getElementById('saveAsName');
+    const fmtSelect = document.getElementById('saveAsFormat');
+    if(nameInput && fmtSelect){
+      fmtSelect.addEventListener('change', () => {
+        const v = nameInput.value.replace(/\.(json|dxf|dwg)$/i, '');
+        nameInput.value = v + '.' + fmtSelect.value;
+      });
+    }
+  }, 50);
+}
+
+function writeFile(name, format, explicit){
+  // Remove extension from name if present
+  const baseName = name.replace(/\.(json|dxf|dwg)$/i, '');
+  let ext = '.' + format;
+  if(format === 'dwg'){
+    logCmd('<span style="color:#facc15">⚠ DWG est un format binaire. Le fichier sera un DXF renommé .dwg, lisible par la plupart des visionneuses CAO mais ne constitue pas un vrai binaire DWG.</span>');
+  }
+  const finalName = baseName + ext;
+  let content, mime;
+  if(format === 'json'){
+    const data = {
+      version: '1.0',
+      type: 'BregaCAD-JSON',
+      filename: finalName,
+      entities: ENTITIES,
+      layers: LAYER_DEF,
+      currentLayer,
+      measurements: measurements,
+      nextId,
+      settings: { showGrid, gridSize: 20, snapOn, orthoOn }
+    };
+    content = JSON.stringify(data, null, 2);
+    mime = 'application/json';
+  } else {
+    // DXF (used for both .dxf and .dwg)
+    content = buildDxfString();
+    mime = format === 'dwg' ? 'application/acad' : 'application/dxf';
+  }
+  const blob = new Blob([content], {type: mime + ';charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = finalName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  currentFilename = finalName;
+  currentFileFormat = format;
+  isModified = false;
+  updateTitle();
+  logCmd('<span style="color:#22c55e">✓ Enregistré: <b>'+finalName+'</b> ('+ENTITIES.length+' entités, '+(content.length/1024).toFixed(1)+' Ko)</span>');
+}
+
+function buildDxfString(){
+  // Build a proper DXF with all layers and entities (true colors, all types)
+  function colorCodes(hex, layerColor){
+    if(!hex) return '';
+    const eAci = HEX_TO_ACI(hex);
+    let s = '';
+    if(hex.toLowerCase() === (layerColor||'').toLowerCase()) return '';
+    if(eAci !== null) s += '62\n'+eAci+'\n';
+    const tc = hexToTrueColor(hex);
+    if(tc !== null) s += '420\n'+tc+'\n';
+    return s;
+  }
+  let dxf = '0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n9\n$INSBASE\n10\n0.0\n20\n0.0\n30\n0.0\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n'+Object.keys(LAYER_DEF).length+'\n';
+  for(const [name,def] of Object.entries(LAYER_DEF)){
+    const aci = HEX_TO_ACI(def.color) || 7;
+    let layerCode = '0\nLAYER\n2\n'+name+'\n70\n0\n62\n'+aci;
+    const tc = hexToTrueColor(def.color);
+    if(aci === 7 && tc) layerCode += '\n420\n'+tc;
+    layerCode += '\n6\nCONTINUOUS\n';
+    dxf += layerCode;
+  }
+  dxf += '0\nENDTAB\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n';
+  for(const e of ENTITIES){
+    const layer = e.layer || '0';
+    const layerDef = LAYER_DEF[layer];
+    const layerColor = layerDef ? layerDef.color : null;
+    const cc = colorCodes(e.color, layerColor);
+    const head = '0\n'+e.type.toUpperCase()+'\n8\n'+layer+'\n'+(cc?cc:'');
+    if(e.type==='LWPOLYLINE'||e.type==='SPLINE'){
+      dxf += head+'90\n'+(e.pts?e.pts.length:0)+'\n70\n'+(e.closed?1:0)+'\n';
+      if(e.pts) for(const p of e.pts) dxf += '10\n'+p[0]+'\n20\n'+p[1]+'\n';
+    } else if(e.type==='LINE'){
+      dxf += head+'10\n'+e.x1+'\n20\n'+e.y1+'\n11\n'+e.x2+'\n21\n'+e.y2+'\n';
+    } else if(e.type==='CIRCLE'){
+      dxf += head+'10\n'+e.cx+'\n20\n'+e.cy+'\n40\n'+e.r+'\n';
+    } else if(e.type==='ARC'){
+      dxf += head+'10\n'+e.cx+'\n20\n'+e.cy+'\n40\n'+e.r+'\n50\n'+(e.startA*180/Math.PI)+'\n51\n'+(e.endA*180/Math.PI)+'\n';
+    } else if(e.type==='RECT'){
+      dxf += head+'90\n5\n70\n1\n';
+      [[e.x1,e.y1],[e.x2,e.y1],[e.x2,e.y2],[e.x1,e.y2],[e.x1,e.y1]].forEach(p=>dxf+='10\n'+p[0]+'\n20\n'+p[1]+'\n');
+    } else if(e.type==='TEXT'){
+      dxf += head+'10\n'+e.x+'\n20\n'+e.y+'\n40\n'+e.h+'\n1\n'+(e.text||'')+'\n';
+    } else if(e.type==='POINT'){
+      dxf += head+'10\n'+e.x+'\n20\n'+e.y+'\n';
+    }
+  }
+  dxf += '0\nENDSEC\n0\nEOF\n';
+  return dxf;
+}
+// Map hex color to nearest ACI (AutoCAD Color Index)
+const HEX_TO_ACI = (() => {
+  const m = {
+    '#ff0000':1,'#ffff00':2,'#00ff00':3,'#00ffff':4,'#0000ff':5,'#ff00ff':6,
+    '#ffffff':7,'#414141':8,'#808080':9,'#ff0000':1,'#ffaaaa':11,'#bd0000':12,
+    '#bd7e7e':13,'#810000':14,'#bd5e00':16,'#ffaa00':30,'#bd7e00':32,'#bd7e40':33,
+    '#813e00':34,'#00bd00':46,'#00bd5e':48,'#00bd7e':49,'#00bd81':51,'#005e00':58,
+    '#aaffaa':61,'#005e5e':66,'#00bd81':79,'#0000ff':5,'#aaaaff':117,'#0000bd':140,
+    '#5e5ebd':141,'#5e5e81':142,'#000081':144,'#aa00ff':200,'#ffaaff':201,
+    '#bd00bd':202,'#bd5ebd':204,'#810081':206,'#bd5e81':210,'#aaffff':221,
+    '#bd8181':231,'#ff8181':232,'#bd5e5e':234,'#813e3e':236,
+  };
+  return (hex) => {
+    const aci = m[(hex||'').toLowerCase()];
+    return aci !== undefined ? aci : null; // null = use true color
+  };
+})();
+
+// Convert hex to 24-bit integer for DXF group code 420 (true color)
+function hexToTrueColor(hex){
+  if(!hex) return null;
+  const m = hex.match(/^#?([0-9a-f]{6})$/i);
+  if(!m) return null;
+  return parseInt(m[1], 16);
+}
+
+// Convert 24-bit integer to hex
+function trueColorToHex(n){
+  if(n === undefined || n === null) return null;
+  return '#' + (n | 0).toString(16).padStart(6, '0');
+}
+
+function exportDXF(){
+  const dxf = buildDxfString();
+  const blob = new Blob([dxf], {type:'application/dxf;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = (currentFilename ? currentFilename.replace(/\.(json|dwg)$/i, '') : 'brega_airport') + '.dxf';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  logCmd('<span style="color:#22c55e">✓ DXF exporté: '+a.download+' ('+ENTITIES.length+' entités)</span>');
+}
+function exportSVG(){
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${DX} ${DY}">`;
+  for(const e of ENTITIES){
+    if(e.type==='LWPOLYLINE'&&e.pts){
+      s+=`<polyline points="${e.pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${e.color}" stroke-width="${e.lw}"/>`;
+    }
+    if(e.type==='CIRCLE') s+=`<circle cx="${e.cx}" cy="${e.cy}" r="${e.r}" fill="none" stroke="${e.color}" stroke-width="${e.lw}"/>`;
+    if(e.type==='TEXT') s+=`<text x="${e.x}" y="${e.y}" font-size="${e.h}" fill="${e.color}" font-family="monospace">${e.text}</text>`;
+  }
+  s+='</svg>';
+  const a=document.createElement('a');
+  a.href='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+  a.download='Brega_Airport.svg'; a.click();
+  logCmd('SVG exporté.');
+}
+function measureDist(){logCmd('Mesure distance: cliquez deux points...');setTool('line');}
+function measureArea(){logCmd('Mesure surface: dessinez un contour fermé...');setTool('pline');}
+function purge(){
+  const before=ENTITIES.length;
+  ENTITIES=ENTITIES.filter(e=>!(e.type==='POINT'&&!ENTITIES.some(x=>x!==e&&x.selected)));
+  logCmd(`Purge: ${before-ENTITIES.length} objet(s) supprimé(s).`);
+  redraw();
+}
+function addLayout(){
+  const tabs=document.getElementById('vp-tabs');
+  const n=tabs.querySelectorAll('.vptab').length+1;
+  const t=document.createElement('div'); t.className='vptab'; t.textContent='Layout'+n;
+  tabs.querySelector('.vptab-add').before(t);
+}
+function cycleView(){
+  const faces=['PLAN','ISO NE','ISO NO','3D SUD'];
+  const el=document.getElementById('nav-face');
+  const i=faces.indexOf(el.textContent);
+  el.textContent=faces[(i+1)%faces.length];
+}
+function showHelp(){
+  alert(`RACCOURCIS CLAVIER
+L = Ligne          PL = Polyligne
+C = Cercle         A = Arc
+T = Texte          P = Panoramique
+Z = Zoom           Esc = Sélectionner
+Del = Effacer      F7 = Grille
+F8 = Ortho         F3 = Accrochage
+Ctrl+Z = Annuler   Ctrl+Y = Rétablir
+Ctrl+A = Tout sél. Ctrl+S = Enregistrer
+Entrée = Fin polyligne/ligne
+Double-clic = Fin polyligne
+Clic droit = Annuler saisie
+Molette = Zoom     Clic milieu = Pan`);
+}
+function copySelected(){
+  const sel=ENTITIES.filter(e=>e.selected);
+  if(!sel.length){logCmd('Aucun objet sélectionné.');return;}
+  saveState();
+  for(const e of sel){
+    const c=JSON.parse(JSON.stringify(e));
+    c.id=nextId++;
+    if(c.pts)c.pts=c.pts.map(p=>[p[0]+20,p[1]+20]);
+    if(c.x!==undefined)c.x+=20;
+    if(c.y!==undefined)c.y+=20;
+    if(c.x1!==undefined){c.x1+=20;c.x2+=20;c.y1+=20;c.y2+=20;}
+    if(c.cx!==undefined){c.cx+=20;c.cy+=20;}
+    c.selected=true;
+    ENTITIES.push(c);
+  }
+  ENTITIES.filter(e=>!sel.includes(e)).forEach(e=>e.selected=false);
+  logCmd(`${sel.length} objet(s) copié(s).`);
+  redraw();updateSelCount();
+}
+
+// ── DRAG & DROP ──
+(function(){
+  let dragCount = 0;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(29,78,216,0.85);color:#fff;display:none;align-items:center;justify-content:center;font-size:18px;font-weight:600;z-index:9999;pointer-events:none;flex-direction:column;gap:8px;';
+  overlay.innerHTML = '<div style="font-size:48px">📂</div><div>Déposer le fichier DXF ou JSON ici</div>';
+  document.body.appendChild(overlay);
+  window.addEventListener('dragenter', e => { e.preventDefault(); dragCount++; overlay.style.display='flex'; });
+  window.addEventListener('dragleave', e => { e.preventDefault(); dragCount--; if(dragCount<=0){dragCount=0; overlay.style.display='none';} });
+  window.addEventListener('dragover', e => { e.preventDefault(); });
+  window.addEventListener('drop', e => {
+    e.preventDefault(); dragCount=0; overlay.style.display='none';
+    const f = e.dataTransfer.files[0]; if(!f) return;
+    handleOpenFile(f);
+  });
+})();
+
+// ── INIT ──
+window.addEventListener('load',()=>{
+  resizeCanvases();
+  buildRibbon('home');
+  showPanel('props');
+  syncStatusBar();
+  updateTitle();
+  setTimeout(fitView,100);
+});
+window.addEventListener('resize',resizeCanvases);
+window.addEventListener('beforeunload', e => {
+  if(isModified){
+    e.preventDefault();
+    e.returnValue = 'Modifications non enregistrées. Quitter quand même ?';
+    return e.returnValue;
+  }
+});
